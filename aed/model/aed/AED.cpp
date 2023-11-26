@@ -1,0 +1,12 @@
+#include "AED.h"
+
+enum AEDStatus {
+    CHECK_RESPONSIVENESS,
+    CALL_HELP,
+    ATTACH_PADS,
+    DONT_TOUCH_PATIENT,
+    START_CPR,
+    AED_OFF,
+    AED_BATTERY_DEAD,
+    AED_TEST_FAIL
+};

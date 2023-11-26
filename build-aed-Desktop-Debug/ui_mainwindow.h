@@ -11,11 +11,13 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QVBoxLayout>
@@ -27,7 +29,6 @@ class Ui_MainWindow
 {
 public:
     QWidget *centralwidget;
-    QHBoxLayout *horizontalLayout_20;
     QWidget *verticalWidget;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout_5;
@@ -55,35 +56,65 @@ public:
     QHBoxLayout *horizontalLayout_13;
     QLabel *shocksCount_3;
     QSlider *depthSlider;
+    QWidget *horizontalWidget_5;
+    QHBoxLayout *horizontalLayout_20;
+    QLabel *label_18;
+    QLabel *batteryLabel;
     QHBoxLayout *horizontalLayout_6;
     QHBoxLayout *horizontalLayout_8;
     QFrame *indicator5;
     QLabel *label_6;
     QHBoxLayout *horizontalLayout_11;
     QFrame *frame_9;
-    QFrame *indicator4_2;
+    QFrame *heartIndicator;
     QLabel *label_9;
     QWidget *widget2;
     QHBoxLayout *horizontalLayout_9;
     QFrame *indicator4;
     QLabel *label_7;
+    QWidget *horizontalWidget;
+    QHBoxLayout *horizontalLayout_3;
+    QVBoxLayout *verticalLayout_9;
+    QWidget *widget3;
+    QHBoxLayout *horizontalLayout_16;
+    QFrame *testPassIndicator;
+    QLabel *label_13;
+    QWidget *widget_3;
+    QHBoxLayout *horizontalLayout_22;
+    QFrame *testPassIndicator_3;
+    QLabel *label_21;
+    QPushButton *turnOnButton;
+    QPushButton *turnOffButton;
     QWidget *verticalWidget_2;
     QVBoxLayout *verticalLayout_4;
     QVBoxLayout *verticalLayout_5;
     QLabel *label_10;
+    QHBoxLayout *horizontalLayout_23;
+    QLabel *label_22;
+    QSlider *batterySlider;
+    QLabel *batterySliderLabel;
+    QLabel *qrsWidthLabel_6;
     QHBoxLayout *horizontalLayout_15;
     QLabel *label_12;
-    QSlider *horizontalSlider_2;
+    QSlider *baseDepthSlider;
     QLabel *baseDepthLabel;
     QLabel *qrsWidthLabel_4;
     QHBoxLayout *horizontalLayout_14;
     QLabel *label_11;
-    QSlider *horizontalSlider;
+    QSlider *baseDepthVarianceSlider;
     QLabel *baseDepthVarianceLabel;
     QLabel *qrsWidthLabel_5;
     QVBoxLayout *verticalLayout_6;
     QLabel *label_14;
+    QWidget *widget_2;
     QVBoxLayout *actionsWidget;
+    QPushButton *changeBatteriesButton;
+    QPushButton *attachDefibPadsCorrectlyButton;
+    QPushButton *attachDefibPadsIncorrectlyButton;
+    QPushButton *insertPatientIntoAEDButton;
+    QPushButton *administerShockButton;
+    QPushButton *interruptShockButton;
+    QPushButton *cprButton;
     QVBoxLayout *verticalLayout_7;
     QLabel *label_15;
     QHBoxLayout *horizontalLayout_17;
@@ -97,12 +128,11 @@ public:
     QLabel *qrsWidthLabel_2;
     QHBoxLayout *horizontalLayout_19;
     QLabel *label_19;
-    QSlider *qrsWithVarianceSlider;
+    QSlider *qrsWidthVarianceSlider;
     QLabel *qrsWidthVarianceLabel;
     QLabel *qrsWidthLabel_3;
-    QLabel *label_18;
-    QVBoxLayout *verticalLayout_8;
-    QVBoxLayout *actionsWidget_2;
+    QHBoxLayout *horizontalLayout_24;
+    QCheckBox *vtachCheckbox;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -110,13 +140,12 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(875, 354);
+        MainWindow->resize(875, 560);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
-        horizontalLayout_20 = new QHBoxLayout(centralwidget);
-        horizontalLayout_20->setObjectName(QString::fromUtf8("horizontalLayout_20"));
         verticalWidget = new QWidget(centralwidget);
         verticalWidget->setObjectName(QString::fromUtf8("verticalWidget"));
+        verticalWidget->setGeometry(QRect(9, 9, 351, 368));
         verticalWidget->setMinimumSize(QSize(338, 0));
         verticalLayout = new QVBoxLayout(verticalWidget);
         verticalLayout->setSpacing(10);
@@ -278,14 +307,47 @@ public:
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(depthSlider->sizePolicy().hasHeightForWidth());
         depthSlider->setSizePolicy(sizePolicy2);
+        depthSlider->setMaximum(100);
         depthSlider->setTracking(false);
         depthSlider->setOrientation(Qt::Vertical);
         depthSlider->setInvertedAppearance(false);
+        depthSlider->setTickPosition(QSlider::TicksBothSides);
+        depthSlider->setTickInterval(10);
 
         horizontalLayout_12->addWidget(depthSlider);
 
 
         verticalLayout_2->addLayout(horizontalLayout_12);
+
+        horizontalWidget_5 = new QWidget(screen);
+        horizontalWidget_5->setObjectName(QString::fromUtf8("horizontalWidget_5"));
+        horizontalWidget_5->setMinimumSize(QSize(0, 30));
+        horizontalWidget_5->setMaximumSize(QSize(16777215, 20));
+        horizontalLayout_20 = new QHBoxLayout(horizontalWidget_5);
+        horizontalLayout_20->setObjectName(QString::fromUtf8("horizontalLayout_20"));
+        label_18 = new QLabel(horizontalWidget_5);
+        label_18->setObjectName(QString::fromUtf8("label_18"));
+        sizePolicy.setHeightForWidth(label_18->sizePolicy().hasHeightForWidth());
+        label_18->setSizePolicy(sizePolicy);
+        label_18->setMinimumSize(QSize(0, 20));
+        label_18->setMaximumSize(QSize(16777215, 16777215));
+        label_18->setFont(font);
+        label_18->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
+
+        horizontalLayout_20->addWidget(label_18);
+
+        batteryLabel = new QLabel(horizontalWidget_5);
+        batteryLabel->setObjectName(QString::fromUtf8("batteryLabel"));
+        sizePolicy1.setHeightForWidth(batteryLabel->sizePolicy().hasHeightForWidth());
+        batteryLabel->setSizePolicy(sizePolicy1);
+        batteryLabel->setMinimumSize(QSize(0, 20));
+        batteryLabel->setFont(font);
+        batteryLabel->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
+
+        horizontalLayout_20->addWidget(batteryLabel);
+
+
+        verticalLayout_2->addWidget(horizontalWidget_5);
 
 
         verticalLayout->addWidget(screen);
@@ -321,13 +383,13 @@ public:
         frame_9->setStyleSheet(QString::fromUtf8("background: hsl(120, 00%, 60%);"));
         frame_9->setFrameShape(QFrame::StyledPanel);
         frame_9->setFrameShadow(QFrame::Raised);
-        indicator4_2 = new QFrame(frame_9);
-        indicator4_2->setObjectName(QString::fromUtf8("indicator4_2"));
-        indicator4_2->setGeometry(QRect(0, 0, 10, 10));
-        indicator4_2->setMaximumSize(QSize(10, 10));
-        indicator4_2->setStyleSheet(QString::fromUtf8("background: hsl(120, 00%, 60%);"));
-        indicator4_2->setFrameShape(QFrame::StyledPanel);
-        indicator4_2->setFrameShadow(QFrame::Raised);
+        heartIndicator = new QFrame(frame_9);
+        heartIndicator->setObjectName(QString::fromUtf8("heartIndicator"));
+        heartIndicator->setGeometry(QRect(0, 0, 10, 10));
+        heartIndicator->setMaximumSize(QSize(10, 10));
+        heartIndicator->setStyleSheet(QString::fromUtf8("background: hsl(120, 00%, 60%);"));
+        heartIndicator->setFrameShape(QFrame::StyledPanel);
+        heartIndicator->setFrameShadow(QFrame::Raised);
 
         horizontalLayout_11->addWidget(frame_9);
 
@@ -366,11 +428,80 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_6);
 
+        horizontalWidget = new QWidget(verticalWidget);
+        horizontalWidget->setObjectName(QString::fromUtf8("horizontalWidget"));
+        horizontalWidget->setMinimumSize(QSize(0, 10));
+        horizontalLayout_3 = new QHBoxLayout(horizontalWidget);
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        verticalLayout_9 = new QVBoxLayout();
+        verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
+        widget3 = new QWidget(horizontalWidget);
+        widget3->setObjectName(QString::fromUtf8("widget3"));
+        widget3->setMinimumSize(QSize(0, 30));
+        widget3->setMaximumSize(QSize(16777215, 30));
+        horizontalLayout_16 = new QHBoxLayout(widget3);
+        horizontalLayout_16->setObjectName(QString::fromUtf8("horizontalLayout_16"));
+        testPassIndicator = new QFrame(widget3);
+        testPassIndicator->setObjectName(QString::fromUtf8("testPassIndicator"));
+        testPassIndicator->setMaximumSize(QSize(10, 10));
+        testPassIndicator->setStyleSheet(QString::fromUtf8("background: hsl(120, 00%, 60%);"));
+        testPassIndicator->setFrameShape(QFrame::StyledPanel);
+        testPassIndicator->setFrameShadow(QFrame::Raised);
 
-        horizontalLayout_20->addWidget(verticalWidget);
+        horizontalLayout_16->addWidget(testPassIndicator);
+
+        label_13 = new QLabel(widget3);
+        label_13->setObjectName(QString::fromUtf8("label_13"));
+        label_13->setAutoFillBackground(false);
+
+        horizontalLayout_16->addWidget(label_13);
+
+
+        verticalLayout_9->addWidget(widget3);
+
+        widget_3 = new QWidget(horizontalWidget);
+        widget_3->setObjectName(QString::fromUtf8("widget_3"));
+        widget_3->setMinimumSize(QSize(0, 30));
+        widget_3->setMaximumSize(QSize(16777215, 30));
+        horizontalLayout_22 = new QHBoxLayout(widget_3);
+        horizontalLayout_22->setObjectName(QString::fromUtf8("horizontalLayout_22"));
+        testPassIndicator_3 = new QFrame(widget_3);
+        testPassIndicator_3->setObjectName(QString::fromUtf8("testPassIndicator_3"));
+        testPassIndicator_3->setMaximumSize(QSize(10, 10));
+        testPassIndicator_3->setStyleSheet(QString::fromUtf8("background: hsl(120, 00%, 60%);"));
+        testPassIndicator_3->setFrameShape(QFrame::StyledPanel);
+        testPassIndicator_3->setFrameShadow(QFrame::Raised);
+
+        horizontalLayout_22->addWidget(testPassIndicator_3);
+
+        label_21 = new QLabel(widget_3);
+        label_21->setObjectName(QString::fromUtf8("label_21"));
+        label_21->setAutoFillBackground(false);
+
+        horizontalLayout_22->addWidget(label_21);
+
+
+        verticalLayout_9->addWidget(widget_3);
+
+
+        horizontalLayout_3->addLayout(verticalLayout_9);
+
+        turnOnButton = new QPushButton(horizontalWidget);
+        turnOnButton->setObjectName(QString::fromUtf8("turnOnButton"));
+
+        horizontalLayout_3->addWidget(turnOnButton);
+
+        turnOffButton = new QPushButton(horizontalWidget);
+        turnOffButton->setObjectName(QString::fromUtf8("turnOffButton"));
+
+        horizontalLayout_3->addWidget(turnOffButton);
+
+
+        verticalLayout->addWidget(horizontalWidget);
 
         verticalWidget_2 = new QWidget(centralwidget);
         verticalWidget_2->setObjectName(QString::fromUtf8("verticalWidget_2"));
+        verticalWidget_2->setGeometry(QRect(366, 9, 500, 498));
         verticalWidget_2->setMinimumSize(QSize(500, 0));
         verticalLayout_4 = new QVBoxLayout(verticalWidget_2);
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
@@ -381,6 +512,44 @@ public:
 
         verticalLayout_5->addWidget(label_10);
 
+        horizontalLayout_23 = new QHBoxLayout();
+        horizontalLayout_23->setObjectName(QString::fromUtf8("horizontalLayout_23"));
+        label_22 = new QLabel(verticalWidget_2);
+        label_22->setObjectName(QString::fromUtf8("label_22"));
+        label_22->setMinimumSize(QSize(150, 0));
+        label_22->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        horizontalLayout_23->addWidget(label_22);
+
+        batterySlider = new QSlider(verticalWidget_2);
+        batterySlider->setObjectName(QString::fromUtf8("batterySlider"));
+        batterySlider->setMaximum(100);
+        batterySlider->setValue(100);
+        batterySlider->setOrientation(Qt::Horizontal);
+        batterySlider->setTickPosition(QSlider::TicksBelow);
+        batterySlider->setTickInterval(10);
+
+        horizontalLayout_23->addWidget(batterySlider);
+
+        batterySliderLabel = new QLabel(verticalWidget_2);
+        batterySliderLabel->setObjectName(QString::fromUtf8("batterySliderLabel"));
+        batterySliderLabel->setMinimumSize(QSize(25, 0));
+        batterySliderLabel->setMaximumSize(QSize(16777215, 16777215));
+        batterySliderLabel->setAlignment(Qt::AlignCenter);
+
+        horizontalLayout_23->addWidget(batterySliderLabel);
+
+        qrsWidthLabel_6 = new QLabel(verticalWidget_2);
+        qrsWidthLabel_6->setObjectName(QString::fromUtf8("qrsWidthLabel_6"));
+        qrsWidthLabel_6->setMinimumSize(QSize(0, 0));
+        qrsWidthLabel_6->setMaximumSize(QSize(16777215, 16777215));
+        qrsWidthLabel_6->setAlignment(Qt::AlignCenter);
+
+        horizontalLayout_23->addWidget(qrsWidthLabel_6);
+
+
+        verticalLayout_5->addLayout(horizontalLayout_23);
+
         horizontalLayout_15 = new QHBoxLayout();
         horizontalLayout_15->setObjectName(QString::fromUtf8("horizontalLayout_15"));
         label_12 = new QLabel(verticalWidget_2);
@@ -390,15 +559,15 @@ public:
 
         horizontalLayout_15->addWidget(label_12);
 
-        horizontalSlider_2 = new QSlider(verticalWidget_2);
-        horizontalSlider_2->setObjectName(QString::fromUtf8("horizontalSlider_2"));
-        horizontalSlider_2->setMaximum(300);
-        horizontalSlider_2->setValue(200);
-        horizontalSlider_2->setOrientation(Qt::Horizontal);
-        horizontalSlider_2->setTickPosition(QSlider::TicksBelow);
-        horizontalSlider_2->setTickInterval(100);
+        baseDepthSlider = new QSlider(verticalWidget_2);
+        baseDepthSlider->setObjectName(QString::fromUtf8("baseDepthSlider"));
+        baseDepthSlider->setMaximum(300);
+        baseDepthSlider->setValue(200);
+        baseDepthSlider->setOrientation(Qt::Horizontal);
+        baseDepthSlider->setTickPosition(QSlider::TicksBelow);
+        baseDepthSlider->setTickInterval(100);
 
-        horizontalLayout_15->addWidget(horizontalSlider_2);
+        horizontalLayout_15->addWidget(baseDepthSlider);
 
         baseDepthLabel = new QLabel(verticalWidget_2);
         baseDepthLabel->setObjectName(QString::fromUtf8("baseDepthLabel"));
@@ -428,14 +597,14 @@ public:
 
         horizontalLayout_14->addWidget(label_11);
 
-        horizontalSlider = new QSlider(verticalWidget_2);
-        horizontalSlider->setObjectName(QString::fromUtf8("horizontalSlider"));
-        horizontalSlider->setMaximum(100);
-        horizontalSlider->setOrientation(Qt::Horizontal);
-        horizontalSlider->setTickPosition(QSlider::TicksBelow);
-        horizontalSlider->setTickInterval(10);
+        baseDepthVarianceSlider = new QSlider(verticalWidget_2);
+        baseDepthVarianceSlider->setObjectName(QString::fromUtf8("baseDepthVarianceSlider"));
+        baseDepthVarianceSlider->setMaximum(100);
+        baseDepthVarianceSlider->setOrientation(Qt::Horizontal);
+        baseDepthVarianceSlider->setTickPosition(QSlider::TicksBelow);
+        baseDepthVarianceSlider->setTickInterval(10);
 
-        horizontalLayout_14->addWidget(horizontalSlider);
+        horizontalLayout_14->addWidget(baseDepthVarianceSlider);
 
         baseDepthVarianceLabel = new QLabel(verticalWidget_2);
         baseDepthVarianceLabel->setObjectName(QString::fromUtf8("baseDepthVarianceLabel"));
@@ -463,10 +632,68 @@ public:
 
         verticalLayout_6->addWidget(label_14);
 
-        actionsWidget = new QVBoxLayout();
+        widget_2 = new QWidget(verticalWidget_2);
+        widget_2->setObjectName(QString::fromUtf8("widget_2"));
+        QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Expanding);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(widget_2->sizePolicy().hasHeightForWidth());
+        widget_2->setSizePolicy(sizePolicy3);
+        widget_2->setMinimumSize(QSize(0, 20));
+        actionsWidget = new QVBoxLayout(widget_2);
         actionsWidget->setObjectName(QString::fromUtf8("actionsWidget"));
+        changeBatteriesButton = new QPushButton(widget_2);
+        changeBatteriesButton->setObjectName(QString::fromUtf8("changeBatteriesButton"));
+        changeBatteriesButton->setEnabled(true);
+        changeBatteriesButton->setStyleSheet(QString::fromUtf8(""));
+        changeBatteriesButton->setFlat(false);
 
-        verticalLayout_6->addLayout(actionsWidget);
+        actionsWidget->addWidget(changeBatteriesButton);
+
+        attachDefibPadsCorrectlyButton = new QPushButton(widget_2);
+        attachDefibPadsCorrectlyButton->setObjectName(QString::fromUtf8("attachDefibPadsCorrectlyButton"));
+        attachDefibPadsCorrectlyButton->setEnabled(true);
+        attachDefibPadsCorrectlyButton->setFlat(false);
+
+        actionsWidget->addWidget(attachDefibPadsCorrectlyButton);
+
+        attachDefibPadsIncorrectlyButton = new QPushButton(widget_2);
+        attachDefibPadsIncorrectlyButton->setObjectName(QString::fromUtf8("attachDefibPadsIncorrectlyButton"));
+        attachDefibPadsIncorrectlyButton->setEnabled(true);
+        attachDefibPadsIncorrectlyButton->setFlat(false);
+
+        actionsWidget->addWidget(attachDefibPadsIncorrectlyButton);
+
+        insertPatientIntoAEDButton = new QPushButton(widget_2);
+        insertPatientIntoAEDButton->setObjectName(QString::fromUtf8("insertPatientIntoAEDButton"));
+        insertPatientIntoAEDButton->setEnabled(true);
+        insertPatientIntoAEDButton->setFlat(false);
+
+        actionsWidget->addWidget(insertPatientIntoAEDButton);
+
+        administerShockButton = new QPushButton(widget_2);
+        administerShockButton->setObjectName(QString::fromUtf8("administerShockButton"));
+        administerShockButton->setEnabled(true);
+        administerShockButton->setFlat(false);
+
+        actionsWidget->addWidget(administerShockButton);
+
+        interruptShockButton = new QPushButton(widget_2);
+        interruptShockButton->setObjectName(QString::fromUtf8("interruptShockButton"));
+        interruptShockButton->setEnabled(true);
+        interruptShockButton->setFlat(false);
+
+        actionsWidget->addWidget(interruptShockButton);
+
+        cprButton = new QPushButton(widget_2);
+        cprButton->setObjectName(QString::fromUtf8("cprButton"));
+        cprButton->setEnabled(true);
+        cprButton->setFlat(false);
+
+        actionsWidget->addWidget(cprButton);
+
+
+        verticalLayout_6->addWidget(widget_2);
 
 
         verticalLayout_5->addLayout(verticalLayout_6);
@@ -501,7 +728,7 @@ public:
 
         ageLabel = new QLabel(verticalWidget_2);
         ageLabel->setObjectName(QString::fromUtf8("ageLabel"));
-        ageLabel->setMinimumSize(QSize(0, 0));
+        ageLabel->setMinimumSize(QSize(20, 0));
         ageLabel->setMaximumSize(QSize(16777215, 16777215));
         ageLabel->setAlignment(Qt::AlignCenter);
 
@@ -532,9 +759,9 @@ public:
 
         qrsWidthLabel = new QLabel(verticalWidget_2);
         qrsWidthLabel->setObjectName(QString::fromUtf8("qrsWidthLabel"));
-        qrsWidthLabel->setMinimumSize(QSize(0, 0));
+        qrsWidthLabel->setMinimumSize(QSize(40, 0));
         qrsWidthLabel->setMaximumSize(QSize(16777215, 16777215));
-        qrsWidthLabel->setAlignment(Qt::AlignCenter);
+        qrsWidthLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         horizontalLayout_18->addWidget(qrsWidthLabel);
 
@@ -558,21 +785,21 @@ public:
 
         horizontalLayout_19->addWidget(label_19);
 
-        qrsWithVarianceSlider = new QSlider(verticalWidget_2);
-        qrsWithVarianceSlider->setObjectName(QString::fromUtf8("qrsWithVarianceSlider"));
-        qrsWithVarianceSlider->setMaximum(120);
-        qrsWithVarianceSlider->setSingleStep(10);
-        qrsWithVarianceSlider->setOrientation(Qt::Horizontal);
-        qrsWithVarianceSlider->setTickPosition(QSlider::TicksBelow);
-        qrsWithVarianceSlider->setTickInterval(10);
+        qrsWidthVarianceSlider = new QSlider(verticalWidget_2);
+        qrsWidthVarianceSlider->setObjectName(QString::fromUtf8("qrsWidthVarianceSlider"));
+        qrsWidthVarianceSlider->setMaximum(120);
+        qrsWidthVarianceSlider->setSingleStep(10);
+        qrsWidthVarianceSlider->setOrientation(Qt::Horizontal);
+        qrsWidthVarianceSlider->setTickPosition(QSlider::TicksBelow);
+        qrsWidthVarianceSlider->setTickInterval(10);
 
-        horizontalLayout_19->addWidget(qrsWithVarianceSlider);
+        horizontalLayout_19->addWidget(qrsWidthVarianceSlider);
 
         qrsWidthVarianceLabel = new QLabel(verticalWidget_2);
         qrsWidthVarianceLabel->setObjectName(QString::fromUtf8("qrsWidthVarianceLabel"));
-        qrsWidthVarianceLabel->setMinimumSize(QSize(0, 0));
+        qrsWidthVarianceLabel->setMinimumSize(QSize(40, 0));
         qrsWidthVarianceLabel->setMaximumSize(QSize(16777215, 16777215));
-        qrsWidthVarianceLabel->setAlignment(Qt::AlignCenter);
+        qrsWidthVarianceLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         horizontalLayout_19->addWidget(qrsWidthVarianceLabel);
 
@@ -587,26 +814,18 @@ public:
 
         verticalLayout_7->addLayout(horizontalLayout_19);
 
-        label_18 = new QLabel(verticalWidget_2);
-        label_18->setObjectName(QString::fromUtf8("label_18"));
+        horizontalLayout_24 = new QHBoxLayout();
+        horizontalLayout_24->setObjectName(QString::fromUtf8("horizontalLayout_24"));
+        vtachCheckbox = new QCheckBox(verticalWidget_2);
+        vtachCheckbox->setObjectName(QString::fromUtf8("vtachCheckbox"));
 
-        verticalLayout_7->addWidget(label_18);
-
-        verticalLayout_8 = new QVBoxLayout();
-        verticalLayout_8->setObjectName(QString::fromUtf8("verticalLayout_8"));
-        actionsWidget_2 = new QVBoxLayout();
-        actionsWidget_2->setObjectName(QString::fromUtf8("actionsWidget_2"));
-
-        verticalLayout_8->addLayout(actionsWidget_2);
+        horizontalLayout_24->addWidget(vtachCheckbox);
 
 
-        verticalLayout_7->addLayout(verticalLayout_8);
+        verticalLayout_7->addLayout(horizontalLayout_24);
 
 
         verticalLayout_4->addLayout(verticalLayout_7);
-
-
-        horizontalLayout_20->addWidget(verticalWidget_2);
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
@@ -628,31 +847,47 @@ public:
         label->setText(QCoreApplication::translate("MainWindow", "Check OK", nullptr));
         label_2->setText(QCoreApplication::translate("MainWindow", "Call for Help", nullptr));
         label_4->setText(QCoreApplication::translate("MainWindow", "Attach defib Pads", nullptr));
-        label_5->setText(QCoreApplication::translate("MainWindow", "Shocks: ", nullptr));
-        shocksCount->setText(QCoreApplication::translate("MainWindow", "shocksCountLabel", nullptr));
-        shocksCount_2->setText(QCoreApplication::translate("MainWindow", "timeLabel", nullptr));
-        shocksCount_3->setText(QCoreApplication::translate("MainWindow", "messageLabel", nullptr));
+        label_5->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" color:#241f31;\">Shocks: </span></p></body></html>", nullptr));
+        shocksCount->setText(QString());
+        shocksCount_2->setText(QString());
+        shocksCount_3->setText(QString());
+        label_18->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" color:#241f31;\">BAT:</span></p></body></html>", nullptr));
+        batteryLabel->setText(QString());
         label_6->setText(QCoreApplication::translate("MainWindow", "Start CPR", nullptr));
         label_9->setText(QCoreApplication::translate("MainWindow", "Heart", nullptr));
         label_7->setText(QCoreApplication::translate("MainWindow", "Don't Touch Patient", nullptr));
+        label_13->setText(QCoreApplication::translate("MainWindow", "Test Pass", nullptr));
+        label_21->setText(QCoreApplication::translate("MainWindow", "Defib Connected", nullptr));
+        turnOnButton->setText(QCoreApplication::translate("MainWindow", "Turn ON", nullptr));
+        turnOffButton->setText(QCoreApplication::translate("MainWindow", "Turn OFF", nullptr));
         label_10->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:18pt;\">Rescuer</span></p></body></html>", nullptr));
+        label_22->setText(QCoreApplication::translate("MainWindow", "Electric Lemon: ", nullptr));
+        batterySliderLabel->setText(QCoreApplication::translate("MainWindow", "100", nullptr));
+        qrsWidthLabel_6->setText(QCoreApplication::translate("MainWindow", "%", nullptr));
         label_12->setText(QCoreApplication::translate("MainWindow", "Base Depth: ", nullptr));
-        baseDepthLabel->setText(QCoreApplication::translate("MainWindow", "0.00", nullptr));
+        baseDepthLabel->setText(QCoreApplication::translate("MainWindow", "2.00", nullptr));
         qrsWidthLabel_4->setText(QCoreApplication::translate("MainWindow", "in", nullptr));
         label_11->setText(QCoreApplication::translate("MainWindow", "Base Depth Variance: ", nullptr));
         baseDepthVarianceLabel->setText(QCoreApplication::translate("MainWindow", "0.00", nullptr));
         qrsWidthLabel_5->setText(QCoreApplication::translate("MainWindow", "in", nullptr));
         label_14->setText(QCoreApplication::translate("MainWindow", "Actions", nullptr));
+        changeBatteriesButton->setText(QCoreApplication::translate("MainWindow", "Change Batteries", nullptr));
+        attachDefibPadsCorrectlyButton->setText(QCoreApplication::translate("MainWindow", "Attach Defib Pads Correctly", nullptr));
+        attachDefibPadsIncorrectlyButton->setText(QCoreApplication::translate("MainWindow", "Attach Defib Pads Incorrectly", nullptr));
+        insertPatientIntoAEDButton->setText(QCoreApplication::translate("MainWindow", "Insert Patient Into AED", nullptr));
+        administerShockButton->setText(QCoreApplication::translate("MainWindow", "Administer Shock", nullptr));
+        interruptShockButton->setText(QCoreApplication::translate("MainWindow", "Interrupt Shock", nullptr));
+        cprButton->setText(QCoreApplication::translate("MainWindow", "CPR", nullptr));
         label_15->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:18pt;\">Patient</span></p></body></html>", nullptr));
         label_16->setText(QCoreApplication::translate("MainWindow", "Age: ", nullptr));
-        ageLabel->setText(QCoreApplication::translate("MainWindow", "99", nullptr));
+        ageLabel->setText(QCoreApplication::translate("MainWindow", "6", nullptr));
         label_17->setText(QCoreApplication::translate("MainWindow", "QRS Width", nullptr));
-        qrsWidthLabel->setText(QCoreApplication::translate("MainWindow", "0000", nullptr));
+        qrsWidthLabel->setText(QCoreApplication::translate("MainWindow", "1000", nullptr));
         qrsWidthLabel_2->setText(QCoreApplication::translate("MainWindow", "ms", nullptr));
         label_19->setText(QCoreApplication::translate("MainWindow", "QRS Width Variance: ", nullptr));
-        qrsWidthVarianceLabel->setText(QCoreApplication::translate("MainWindow", "0120", nullptr));
+        qrsWidthVarianceLabel->setText(QCoreApplication::translate("MainWindow", "0", nullptr));
         qrsWidthLabel_3->setText(QCoreApplication::translate("MainWindow", "ms", nullptr));
-        label_18->setText(QCoreApplication::translate("MainWindow", "Actions", nullptr));
+        vtachCheckbox->setText(QCoreApplication::translate("MainWindow", "VTach", nullptr));
     } // retranslateUi
 
 };
