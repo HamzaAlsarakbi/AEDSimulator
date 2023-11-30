@@ -24,6 +24,7 @@ add_executable(aed
         mainwindow.ui
         model/Rescuer.h
         model/aed/AED.h
+        model/aed/AEDWorker.h
         model/patient/Patient.h
         model/patient/heart/Heart.h
         model/aed/AED.cpp
@@ -40,3 +41,4 @@ add_executable(aed
 target_link_libraries(aed Qt6::Widgets)
 target_link_libraries(aed Qt6::Core)
 target_link_libraries(aed Qt6::Quick)
+

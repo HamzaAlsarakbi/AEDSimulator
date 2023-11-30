@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "model/aed/AED.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,6 +24,14 @@ public slots:
     void ageSliderHandler(int value);
     void qrsWidthSliderHandler(int value);
     void qrsWidthVarianceSliderHandler(int value);
+    
+    void turnOnHandler();
+    void turnOffHandler();
+    void changeBatteriesHandler();
+    void padsCorrectHandler();
+    void padsIncorrectHandler();
+    void administerShockHandler();
+    void cprHandler();
 
 private:
     Ui::MainWindow *ui;

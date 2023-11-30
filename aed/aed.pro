@@ -10,10 +10,13 @@ CONFIG += c++11
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    model/aed/AED.cpp
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    model/aed/AED.h \
+    model/aed/AEDWorker.h
 
 FORMS += \
     mainwindow.ui

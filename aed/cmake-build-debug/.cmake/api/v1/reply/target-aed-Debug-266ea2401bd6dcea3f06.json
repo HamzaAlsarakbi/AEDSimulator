@@ -29,7 +29,7 @@
 			"C:/Qt/6.6.1/mingw_64/lib/cmake/Qt6Quick/Qt6QuickConfig.cmake",
 			"C:/Qt/6.6.1/mingw_64/lib/cmake/Qt6Network/Qt6NetworkVersionlessTargets.cmake",
 			"C:/Qt/6.6.1/mingw_64/lib/cmake/Qt6Network/Qt6NetworkConfig.cmake",
-			"C:/Program Files/JetBrains/CLion 2023.2.2/bin/cmake/win/x64/share/cmake-3.26/Modules/CMakeFindDependencyMacro.cmake",
+			"C:/Program Files/CMake/share/cmake-3.28/Modules/CMakeFindDependencyMacro.cmake",
 			"C:/Qt/6.6.1/mingw_64/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake",
 			"C:/Qt/6.6.1/mingw_64/lib/cmake/Qt6Qml/Qt6QmlDependencies.cmake",
 			"C:/Qt/6.6.1/mingw_64/lib/cmake/Qt6Qml/Qt6QmlConfig.cmake",
@@ -60,13 +60,13 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 40,
+				"line" : 41,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 42,
+				"line" : 43,
 				"parent" : 0
 			},
 			{
@@ -268,7 +268,7 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 41,
+				"line" : 42,
 				"parent" : 0
 			},
 			{
@@ -359,7 +359,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-g -fdiagnostics-color=always"
+					"fragment" : "-g"
 				}
 			],
 			"defines" : 
@@ -432,18 +432,18 @@
 			"includes" : 
 			[
 				{
-					"path" : "D:/Documents/Study Material/Carleton/Year3/Fall/a4/aed/cmake-build-debug"
+					"path" : "C:/Users/abdul/OneDrive/Desktop/3004/AEDSimulator/aed/cmake-build-debug"
 				},
 				{
-					"path" : "D:/Documents/Study Material/Carleton/Year3/Fall/a4/aed"
+					"path" : "C:/Users/abdul/OneDrive/Desktop/3004/AEDSimulator/aed"
 				},
 				{
 					"backtrace" : 0,
-					"path" : "D:/Documents/Study Material/Carleton/Year3/Fall/a4/aed/cmake-build-debug/aed_autogen/include"
+					"path" : "C:/Users/abdul/OneDrive/Desktop/3004/AEDSimulator/aed/cmake-build-debug/aed_autogen/include"
 				},
 				{
 					"backtrace" : 56,
-					"path" : "D:/Documents/Study Material/Carleton/Year3/Fall/a4/aed/."
+					"path" : "C:/Users/abdul/OneDrive/Desktop/3004/AEDSimulator/aed/."
 				},
 				{
 					"backtrace" : 2,
@@ -515,24 +515,24 @@
 				0,
 				1,
 				2,
-				9,
 				10,
 				11,
 				12,
-				14,
-				17,
-				18
+				13,
+				15,
+				18,
+				19
 			]
 		}
 	],
 	"dependencies" : 
 	[
 		{
-			"backtrace" : 0,
-			"id" : "aed_autogen::@6890427a1f51a3e7e1df"
+			"id" : "aed_autogen_timestamp_deps::@6890427a1f51a3e7e1df"
 		},
 		{
-			"id" : "aed_autogen_timestamp_deps::@6890427a1f51a3e7e1df"
+			"backtrace" : 0,
+			"id" : "aed_autogen::@6890427a1f51a3e7e1df"
 		}
 	],
 	"id" : "aed::@6890427a1f51a3e7e1df",
@@ -656,13 +656,13 @@
 				0,
 				1,
 				2,
-				9,
 				10,
 				11,
 				12,
-				14,
-				17,
-				18
+				13,
+				15,
+				18,
+				19
 			]
 		},
 		{
@@ -674,10 +674,11 @@
 				6,
 				7,
 				8,
-				13,
-				15,
+				9,
+				14,
 				16,
-				19
+				17,
+				20
 			]
 		},
 		{
@@ -685,14 +686,14 @@
 			"sourceIndexes" : 
 			[
 				4,
-				20
+				21
 			]
 		},
 		{
 			"name" : "CMake Rules",
 			"sourceIndexes" : 
 			[
-				21
+				22
 			]
 		}
 	],
@@ -735,6 +736,11 @@
 		{
 			"backtrace" : 1,
 			"path" : "model/aed/AED.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "model/aed/AEDWorker.h",
 			"sourceGroupIndex" : 1
 		},
 		{
