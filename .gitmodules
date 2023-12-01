@@ -1,0 +1,6 @@
+[submodule "aed/googletest"]
+	path = aed/googletest
+	url = https://github.com/google/googletest.git
+[submodule "aed/model/patient/googletest"]
+	path = aed/model/patient/googletest
+	url = https://github.com/google/googletest.git
