@@ -3,37 +3,42 @@
 
 #include <thread>
 #include <vector>
-#include "model/patient/heart/pulse/Pulse.h"
+#include "pulse/Pulse.h"
 
 using namespace std::chrono;
 
-enum HeartStatus {
-    HEART_NORMAL, VTACH, VFIB
+enum HeartStatus
+{
+    HEART_NORMAL,
+    VTACH,
+    VFIB
 };
 
-class Heart {
+class Heart
+{
 public:
     Heart();
     ~Heart();
     HeartStatus getStatus() const { return status; }
     int getHeartRate() const { return heartRate; }
-
-    void setVtach(int vtach) { this->vtach = vtach; }
-    void setPulseTime(int newValue) { this->pulseTime = milliseconds(newValue); }
+    void setBasePulseTime(int newValue) { this->basePulseTime = milliseconds(newValue); }
     void setPulseTimeVariance(int newValue) { this->pulseTimeVariance = milliseconds(newValue); }
-    void shock();
+    void setVtach();
+    int getPulsesCount() const { return pulses.size(); }
 
+    void resetVtach();
+    void shock();
 
 private:
     bool threadActive;
     std::thread thread;
     HeartStatus status;
-    std::vector<Pulse*> pulses;
-    duration<int64_t, std::milli> pulseTime;
+    std::vector<Pulse *> pulses;
+    duration<int64_t, std::milli> basePulseTime; // time to next
     duration<int64_t, std::milli> pulseTimeVariance;
     int heartRate;
     void updateState();
+    long long generatePulseDuration();
 };
 
-
-#endif //AED_HEART_H
+#endif // AED_HEART_H

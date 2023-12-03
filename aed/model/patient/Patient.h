@@ -10,12 +10,13 @@ public:
     ~Patient();
 
     // NO NEED FOR A HEART GETTER
-    int getHeartRate() { this->heart->getHeartRate(); }
-    void setQrsWidth(int newValue) { this->heart->setPulseTime(newValue); }
+    int getHeartRate() { return this->heart->getHeartRate(); }
+    void setQrsWidth(int newValue) { this->heart->setBasePulseTime(newValue); }
     void setQrsWidthVariance(int newValue) { this->heart->setPulseTimeVariance(newValue); }
     void setAge(double age);
     bool shockable();
     bool cpr(); // returns true if compression was good, otherwise false
+    void reset();
 
 private:
     int age;

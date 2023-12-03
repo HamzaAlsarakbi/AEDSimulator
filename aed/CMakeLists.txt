@@ -1,15 +1,13 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.24)
 project(aed)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_PREFIX_PATH "C:\\Qt\\6.6.1\\mingw_64\\lib\\cmake")
+set(CMAKE_PREFIX_PATH "C:\\Qt\\6.6.1\\mingw_64\\bin")
 
+# adding GoogleTests
+add_subdirectory(tests)
 
 include_directories(.)
 
@@ -17,26 +15,36 @@ find_package(Qt6Core REQUIRED)
 find_package(Qt6Widgets REQUIRED)
 find_package(Qt6Quick REQUIRED)
 
-add_executable(aed
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
-        model/Rescuer.h
-        model/aed/AED.h
-        model/patient/Patient.h
-        model/patient/heart/Heart.h
-        model/aed/AED.cpp
-        model/Rescuer.cpp
-        model/patient/heart/Heart.cpp
-        model/patient/Patient.cpp
-        model/patient/heart/pulse/Pulse.h
-        model/patient/heart/pulse/Pulse.cpp
-        model/aed/step/Step.h
-        model/aed/step/action/Action.h
-        model/aed/step/action/Action.cpp
-        model/aed/step/Step.cpp)
+# Create pulse library target
+add_library(pulse
+    model/patient/heart/pulse/Pulse.cpp
+    model/patient/heart/pulse/Pulse.h
+)
 
-target_link_libraries(aed Qt6::Widgets)
-target_link_libraries(aed Qt6::Core)
-target_link_libraries(aed Qt6::Quick)
+# Create heart library target
+add_library(heart
+    model/patient/heart/Heart.cpp
+    model/patient/heart/Heart.h
+)
+
+# Link pulse library with heart library
+target_link_libraries(heart pulse)
+
+add_executable(aed
+    main.cpp
+    mainwindow.cpp
+    mainwindow.h
+    mainwindow.ui
+    model/Rescuer.h
+    model/aed/AED.h
+    model/patient/Patient.h
+    model/aed/AED.cpp
+    model/Rescuer.cpp
+    model/patient/Patient.cpp
+    model/aed/step/Step.h
+    model/aed/step/action/Action.h
+    model/aed/step/action/Action.cpp
+    model/aed/step/Step.cpp)
+
+# Link pulse and heart libraries with the executable
+target_link_libraries(aed heart pulse Qt6::Widgets Qt6::Core Qt6::Quick)
