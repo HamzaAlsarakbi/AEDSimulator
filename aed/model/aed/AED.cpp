@@ -10,6 +10,8 @@ AED::AED()
     connect(this, &AED::initCheckResponsiveness, worker, &AEDWorker::waitCheckResponsiveness);
     connect(this, &AED::initCallHelp, worker, &AEDWorker::waitCallHelp);
     connect(this, &AED::initAttachPads, worker, &AEDWorker::waitAttachPads);
+    connect(this, &AED::initCheckConnection, worker, &AEDWorker::waitCheckConnection);
+    connect(this, &AED::initTypeOfPads, worker, &AEDWorker::waitTypeOfPads);
     connect(this, &AED::initDontTouchPatient, worker, &AEDWorker::waitDontTouchPatient);
     connect(this, &AED::initStartCpr, worker, &AEDWorker::waitStartCpr);
     connect(this, &AED::initChangeBattery, worker, &AEDWorker::waitChangeBattery);
@@ -20,6 +22,8 @@ AED::AED()
     connect(worker, &AEDWorker::readyCheckResponsiveness, this, &AED::handleCheckResponsiveness);
     connect(worker, &AEDWorker::readyCallHelp, this, &AED::handleCallHelp);
     connect(worker, &AEDWorker::readyAttachPads, this, &AED::handleAttachPads);
+    connect(worker, &AEDWorker::readyCheckConnection, this, &AED::handleCheckConnection);
+    connect(worker, &AEDWorker::readyTypeOfPads, this, &AED::handleTypeOfPads);
     connect(worker, &AEDWorker::readyDontTouchPatient, this, &AED::handleDontTouchPatient);
     connect(worker, &AEDWorker::readyStartCpr, this, &AED::handleStartCpr);
     workerThread.start();
@@ -75,7 +79,6 @@ void AED::handleChangeBattery() {
         emit initChangeBattery();
     }
     else {
-        std::cout << "new battery detected" << std::endl;
         emit initSelfTest();
     }
 }
@@ -100,17 +103,41 @@ void AED::handleCallHelp() {
     }   
 }
 void AED::handleAttachPads() {
-    std::cout << "todo emit signal to set display to ATTACH DEFIB PADS TO PATIENT'S CHEST" << std::endl;
-    if(connection == GOOD) {
-        emit initDontTouchPatient();
-        return;
+    if (battery == 0){emit initChangeBattery();}
+    else {
+        if(connection == GOOD) {
+            emit initTypeOfPads();
+            return;
+        }
+        else if (connection == BAD) {
+            emit initCheckConnection();
+            return;
+        }
+        else {
+            std::cout << "todo emit signal to set display to ATTACH DEFIB PADS TO PATIENT'S CHEST" << std::endl;
+            emit initAttachPads();
+        }   
+    } 
+}
+void AED::handleCheckConnection() {
+    if (connection != GOOD) {
+        std::cout << "todo emit signal to set display to CHECK CONNECTION" << std::endl;
+        emit initCheckConnection();
     }
-    else if (connection == BAD) {
-        std::cout << "todo emit signal to set display to ATTACH DEFIB PADS TO PATIENT'S CHEST" << std::endl;
+    else {
+        emit initTypeOfPads();
     }
 }
+void AED::handleTypeOfPads() {
+    /*
+    if (patient->getAge() <= 8) {std::cout << "todo emit signal to set display to CHILD PADS" << std::endl;}
+    else {std::cout << "todo emit signal to set display to ADULT PADS" << std::endl;}
+    */
+    std::cout << "Will display type of pads" << std::endl;
+    emit initDontTouchPatient();
+}
 void AED::handleDontTouchPatient() {
-    std::cout << "todo emit signal to set display to dont touch patient" << std::endl;
+    std::cout << "todo emit signal to set display to DON’T TOUCH PATIENT, ANALYZING" << std::endl;
     emit initStartCpr(); 
 }
 void AED::handleStartCpr() {

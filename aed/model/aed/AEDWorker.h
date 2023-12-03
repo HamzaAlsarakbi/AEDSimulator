@@ -37,6 +37,14 @@ public slots:
         QThread::sleep(stepDuration);
         emit readyAttachPads();
     }
+    void waitCheckConnection() {
+        QThread::sleep(stepDuration);
+        emit readyCheckConnection();
+    }
+    void waitTypeOfPads() {
+        QThread::sleep(stepDuration);
+        emit readyTypeOfPads();
+    }
     void waitDontTouchPatient() {
         QThread::sleep(stepDuration);
         emit readyDontTouchPatient();
@@ -57,6 +65,8 @@ signals:
     void readyCheckResponsiveness();
     void readyCallHelp();
     void readyAttachPads();
+    void readyCheckConnection();
+    void readyTypeOfPads();
     void readyDontTouchPatient();
     void readyStartCpr();
 };

@@ -67,7 +67,7 @@ void MainWindow::qrsWidthVarianceSliderHandler(int value) {
 
 void MainWindow::turnOnHandler(){
     emit aedDevice->initTurnOn();
-    std::cout << "todo MainWindow::turnOnHandler()" << std::endl;
+    //std::cout << "todo MainWindow::turnOnHandler()" << std::endl;
 }
 
 void MainWindow::turnOffHandler(){
@@ -80,12 +80,12 @@ void MainWindow::changeBatteriesHandler(){
 
 void MainWindow::padsCorrectHandler(){
     aedDevice->setPadPlacement(GOOD);
-    std::cout << "todo MainWindow::padsCorrectHandler()" << std::endl;
+    //std::cout << "todo MainWindow::padsCorrectHandler()" << std::endl;
 }
 
 void MainWindow::padsIncorrectHandler(){
     aedDevice->setPadPlacement(BAD);
-    std::cout << "todo MainWindow::padsIncorrectHandler()" << std::endl;
+    //std::cout << "todo MainWindow::padsIncorrectHandler()" << std::endl;
 }
 
 void MainWindow::administerShockHandler(){

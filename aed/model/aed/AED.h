@@ -70,6 +70,8 @@ public slots:
     void handleCheckResponsiveness();
     void handleCallHelp();
     void handleAttachPads();
+    void handleCheckConnection();
+    void handleTypeOfPads();
     void handleDontTouchPatient();
     void handleStartCpr();
 
@@ -80,6 +82,8 @@ signals:
     void initCheckResponsiveness();
     void initCallHelp();
     void initAttachPads();
+    void initCheckConnection();
+    void initTypeOfPads();
     void initDontTouchPatient();
     void initStartCpr();
 
