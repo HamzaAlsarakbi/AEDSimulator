@@ -15,8 +15,8 @@ public:
     void setQrsWidthVariance(int newValue) { this->heart->setPulseTimeVariance(newValue); }
     void setAge(double age);
     bool shockable();
-    bool cpr(); // returns true if compression was good, otherwise false
-    void reset();
+    bool cpr(double); // returns true if compression was good, otherwise false
+    void reset(); // reset  heart status to normal. set pulseTimeVariance to 0 and set basePulseTime to 1000
 
 private:
     int age;

@@ -138,8 +138,8 @@ void Heart::updateState()
                     std::cout << "Pulse Duration Difference: " << pulseDurationDiff << " ms" << std::endl;
 
                     // Define upper and lower limits for pulse duration
-                    long long upperPulseLim = pulseDuration + 60;
-                    long long lowerPulseLim = pulseDuration - 60;
+                    long long upperPulseLim = pulseDuration + 40;
+                    long long lowerPulseLim = pulseDuration - 40;
 
                     // Check if duration is within limits
                     isRegular = pulseDurationDiff <= upperPulseLim && pulseDurationDiff >= lowerPulseLim;
@@ -171,7 +171,7 @@ void Heart::updateState()
             }
             else
             {
-                //status = VFIB; // commenting this out makes heartNormalStatusTest to pass but status wrong for heartVfibTest
+                status = VFIB; // commenting this out makes heartNormalStatusTest to pass but status wrong for heartVfibTest
                 // Use 6-second method to calculate heart rate
                 heartRate = pulses.size() * 10;
             }

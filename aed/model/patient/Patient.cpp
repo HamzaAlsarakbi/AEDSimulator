@@ -26,9 +26,11 @@ bool Patient::shockable(){
     }
 }
 
-bool Patient::cpr(){
-    double rescuerCompressionDepth; // how am I going to be getting this?
-    if(rescuerCompressionDepth >= minCompressionDepth || rescuerCompressionDepth <= maxCompressionDepth){
+bool Patient::cpr(double compressionDepth){
+    if(compressionDepth >= minCompressionDepth || compressionDepth <= maxCompressionDepth){
+        // heart should start stabilizing
+            // basePulseTime start going towards 1000
+            // pulseTimeVariance starts going towards 0
         return true;
     }
     else{
@@ -36,6 +38,6 @@ bool Patient::cpr(){
     }
 }
 
-void Patient::reset(){// is this function supposed to call heart->resetVtach()?
+void Patient::reset(){
 
 }
