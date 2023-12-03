@@ -45,10 +45,15 @@ public slots:
         QThread::sleep(stepDuration);
         emit readyStartCpr();
     }
+    void waitChangeBattery()    {
+        QThread::sleep(stepDuration);
+        emit readyChangeBattery();
+    }
 
 signals:
     void readyTurnOn();
     void readySelfTest();
+    void readyChangeBattery();
     void readyCheckResponsiveness();
     void readyCallHelp();
     void readyAttachPads();

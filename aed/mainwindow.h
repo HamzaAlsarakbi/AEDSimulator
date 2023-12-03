@@ -16,7 +16,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-
 public slots:
     void batterySliderHandler(int value);
     void baseDepthSliderHandler(int value);
@@ -32,9 +31,11 @@ public slots:
     void padsIncorrectHandler();
     void administerShockHandler();
     void cprHandler();
+    void failTestHandler();
 
 private:
     Ui::MainWindow *ui;
+    AED* aedDevice;
     void connectUI();
 };
 #endif // MAINWINDOW_H

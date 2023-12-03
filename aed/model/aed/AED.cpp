@@ -12,8 +12,11 @@ AED::AED()
     connect(this, &AED::initAttachPads, worker, &AEDWorker::waitAttachPads);
     connect(this, &AED::initDontTouchPatient, worker, &AEDWorker::waitDontTouchPatient);
     connect(this, &AED::initStartCpr, worker, &AEDWorker::waitStartCpr);
+    connect(this, &AED::initChangeBattery, worker, &AEDWorker::waitChangeBattery);
+
     connect(worker, &AEDWorker::readyTurnOn, this, &AED::handleTurnOn);
     connect(worker, &AEDWorker::readySelfTest, this, &AED::handleSelfTest);
+    connect(worker, &AEDWorker::readyChangeBattery, this, &AED::handleChangeBattery);
     connect(worker, &AEDWorker::readyCheckResponsiveness, this, &AED::handleCheckResponsiveness);
     connect(worker, &AEDWorker::readyCallHelp, this, &AED::handleCallHelp);
     connect(worker, &AEDWorker::readyAttachPads, this, &AED::handleAttachPads);
@@ -34,17 +37,47 @@ void AED::resetBattery() {
     
 }
 
+void AED::setTestFail(bool state){
+    doesTestFail = state;
+}
+bool AED::getTestFail(){return doesTestFail;}
+
 void AED::setBattery(int battery) {
     this->battery = battery;
     std::cout << "todo emit signal to update batteryLabel from AED::setBattery(...)" << std::endl;
 }
+int AED::getBattery(){return battery;}
+
 void AED::setPadPlacement(ConnectionStatus connection) {
     this->connection = connection;
     emit handleAttachPads();
 }
 
 void AED::handleTurnOn() {
+    status = AED_ON;
+    connection = NONE;
     emit initSelfTest();   
+}
+void AED::handleSelfTest() {
+    if (doesTestFail == false){
+        status = UNIT_OK;
+        std::cout << "todo emit signal to set display to UNIT OK" << std::endl;
+        emit initCheckResponsiveness();
+    }
+    else {
+        status = AED_TEST_FAIL;
+        std::cout << "todo emit signal to set display to TEST FAIL" << std::endl;
+    }   
+}
+void AED::handleChangeBattery() {
+    if (battery == 0) {
+        std::cout << "todo emit signal to set display to CHANGE BATTERIES" << std::endl;
+        emit initChangeBattery();
+    }
+    else {
+        std::cout << "new battery detected" << std::endl;
+        emit initSelfTest();
+    }
 }
 void AED::handleTurnOff() {
     status = AED_OFF;
@@ -52,22 +85,29 @@ void AED::handleTurnOff() {
     lastCompressionDepth = -1.0;
     std::cout << "todo emit signal to set display to blank" << std::endl;
 }
-void AED::handleSelfTest() {
-}
 void AED::handleCheckResponsiveness() {
-    std::cout << "todo emit signal to set display to check responsiveness" << std::endl;
-    emit initCallHelp();
+    if (battery == 0){emit initChangeBattery();}
+    else {
+        std::cout << "todo emit signal to set display to CHECK RESPONSIVENESS" << std::endl;
+        emit initCallHelp();   
+    }
 }
 void AED::handleCallHelp() {
-    std::cout << "todo emit signal to set display to Call help" << std::endl;
-    emit initDontTouchPatient();   
+    if (battery == 0){emit initChangeBattery();}
+    else {
+        std::cout << "todo emit signal to set display to CALL FOR HELP" << std::endl;
+        emit initAttachPads();   
+    }   
 }
 void AED::handleAttachPads() {
+    std::cout << "todo emit signal to set display to ATTACH DEFIB PADS TO PATIENT'S CHEST" << std::endl;
     if(connection == GOOD) {
         emit initDontTouchPatient();
         return;
     }
-    std::cout << "todo emit signal to set display to check or plug in patient" << std::endl;
+    else if (connection == BAD) {
+        std::cout << "todo emit signal to set display to ATTACH DEFIB PADS TO PATIENT'S CHEST" << std::endl;
+    }
 }
 void AED::handleDontTouchPatient() {
     std::cout << "todo emit signal to set display to dont touch patient" << std::endl;

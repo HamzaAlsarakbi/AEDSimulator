@@ -11,7 +11,10 @@
 using namespace std;
 
 enum AEDStatus {
+    AED_ON,
+    UNIT_OK,
     CHECK_RESPONSIVENESS,
+    CHANGE_BATTERY,
     CALL_HELP,
     ATTACH_PADS,
     DONT_TOUCH_PATIENT,
@@ -32,6 +35,12 @@ public:
     AED();
     ~AED();
     // Getters and setters
+    void setBattery(int battery);
+    void setLastCompressDepth(double depth);
+    void setTestFail(bool state);
+    void setPadPlacement(ConnectionStatus status);
+    bool getTestFail();
+    int getBattery();
 
     // Test-related functions
     //void startSelfTest();
@@ -40,10 +49,7 @@ public:
     // AED steps
     void turnOff();
     void turnOn();  // Initiates self-test
-    void setPadPlacement(ConnectionStatus status);
     void resetBattery();
-    void setBattery(int battery);
-    void setLastCompressDepth(double depth);
     void updateState();
 
 private:
@@ -51,6 +57,7 @@ private:
     bool threadActive;
     AEDStatus status;
     int battery;
+    bool doesTestFail = false;
     // Patient* patient;
     ConnectionStatus connection;
     double lastCompressionDepth;
@@ -59,19 +66,23 @@ public slots:
     void handleTurnOn();
     void handleTurnOff();
     void handleSelfTest();
+    void handleChangeBattery();
     void handleCheckResponsiveness();
     void handleCallHelp();
     void handleAttachPads();
     void handleDontTouchPatient();
     void handleStartCpr();
+
 signals:
     void initTurnOn();
     void initSelfTest();
+    void initChangeBattery();
     void initCheckResponsiveness();
     void initCallHelp();
     void initAttachPads();
     void initDontTouchPatient();
     void initStartCpr();
+
 };
 
 

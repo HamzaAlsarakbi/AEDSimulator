@@ -41,4 +41,3 @@ add_executable(aed
 target_link_libraries(aed Qt6::Widgets)
 target_link_libraries(aed Qt6::Core)
 target_link_libraries(aed Qt6::Quick)
-

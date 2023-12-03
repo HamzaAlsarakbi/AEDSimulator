@@ -7,12 +7,16 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    aedDevice = new AED();
+
     connectUI();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete aedDevice;
 }
 void MainWindow::connectUI() {
     // Sliders
@@ -31,9 +35,11 @@ void MainWindow::connectUI() {
     connect(ui->attachDefibPadsIncorrectlyButton, &QPushButton::pressed, this, &MainWindow::padsIncorrectHandler);
     connect(ui->administerShockButton, &QPushButton::pressed, this, &MainWindow::administerShockHandler);
     connect(ui->cprButton, &QPushButton::pressed, this, &MainWindow::cprHandler);
+    connect(ui->failTestButton, &QPushButton::pressed, this, &MainWindow::failTestHandler);
 }
 
 void MainWindow::batterySliderHandler(int value) {
+    aedDevice->setBattery(value);
     ui->batterySliderLabel->setText(QString::number(value, 'd', 0));
     ui->batteryLabel->setText(QString::fromStdString(std::to_string(value) + "%"));
 }
@@ -60,6 +66,7 @@ void MainWindow::qrsWidthVarianceSliderHandler(int value) {
 }
 
 void MainWindow::turnOnHandler(){
+    emit aedDevice->initTurnOn();
     std::cout << "todo MainWindow::turnOnHandler()" << std::endl;
 }
 
@@ -72,10 +79,12 @@ void MainWindow::changeBatteriesHandler(){
 }
 
 void MainWindow::padsCorrectHandler(){
+    aedDevice->setPadPlacement(GOOD);
     std::cout << "todo MainWindow::padsCorrectHandler()" << std::endl;
 }
 
 void MainWindow::padsIncorrectHandler(){
+    aedDevice->setPadPlacement(BAD);
     std::cout << "todo MainWindow::padsIncorrectHandler()" << std::endl;
 }
 
@@ -85,4 +94,13 @@ void MainWindow::administerShockHandler(){
 
 void MainWindow::cprHandler(){
     std::cout << "todo MainWindow::cprHandler()" << std::endl;
+}
+
+void MainWindow::failTestHandler(){
+    if (aedDevice->getTestFail() == false){
+        aedDevice->setTestFail(true);
+        std::cout << "Self Test will fail" << std::endl;}
+    else {
+        aedDevice->setTestFail(false);
+        std::cout << "self Test will succeed" << std::endl;}
 }

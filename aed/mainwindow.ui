@@ -1024,12 +1024,12 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="insertPatientIntoAEDButton">
+             <widget class="QPushButton" name="failTestButton">
               <property name="enabled">
                <bool>true</bool>
               </property>
               <property name="text">
-               <string>Insert Patient Into AED</string>
+               <string>Fail Test</string>
               </property>
               <property name="flat">
                <bool>false</bool>
