@@ -3,6 +3,7 @@
 
 #include <thread>
 #include <vector>
+#include <random>
 #include "pulse/Pulse.h"
 
 using namespace std::chrono;
@@ -28,6 +29,7 @@ public:
 
     void resetVtach();
     void shock();
+    long long generatePulseDuration();
 
 private:
     bool threadActive;
@@ -36,9 +38,10 @@ private:
     std::vector<Pulse *> pulses;
     duration<int64_t, std::milli> basePulseTime; // time to next
     duration<int64_t, std::milli> pulseTimeVariance;
+    std::default_random_engine gen;
+    std::uniform_int_distribution<> distribution;
     int heartRate;
     void updateState();
-    long long generatePulseDuration();
 };
 
 #endif // AED_HEART_H

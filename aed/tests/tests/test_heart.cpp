@@ -3,14 +3,28 @@
 #include <thread>
 #include "../model/patient/heart/Heart.h"
 
+TEST(HeartTest, heartPulseGenerator) {
+    Heart heart;
+    for(int basePulseTime = 100; basePulseTime < 2000; basePulseTime+= 100) {
+        heart.setBasePulseTime(basePulseTime);
+        for(int pulseTimeVariance = 0; pulseTimeVariance <= 120; pulseTimeVariance++) {
+            heart.setPulseTimeVariance(pulseTimeVariance);
+            for(int i = 0; i < (pulseTimeVariance+2)*2; i++) {
+                long long pulseDuration = heart.generatePulseDuration();
+//                std::cout << "pulseDuration with variance of " << pulseTimeVariance << ": (" << pulseDuration << ")" << std::endl;
+                ASSERT_TRUE(pulseDuration <= (basePulseTime + pulseTimeVariance) && pulseDuration >= (basePulseTime - pulseTimeVariance));
+            }
+        }
+    }
+
+
+}
 TEST(HeartTest, heartNormalStatusTest) {
     Heart heart;
 
     // Let the heart update for a while (aka put the test thread to sleep)
     std::cout << "waiting for pulses" << std::endl;
-    while(heart.getPulsesCount() < 6) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
+    std::this_thread::sleep_for(std::chrono::milliseconds (6050));
 
     ASSERT_EQ(heart.getStatus(), HEART_NORMAL);  // Expected status after running for a while
     ASSERT_EQ(heart.getHeartRate(), 60); // Assert heart rate is positive or as expected

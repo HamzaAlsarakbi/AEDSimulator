@@ -1,6 +1,5 @@
 #include <iostream>
 #include "Heart.h"
-
 /**
  * Constructs a Heart object with the following properties
  * - qrsWidth: 1000 milliseconds ~= 60 BPM
@@ -8,8 +7,11 @@
  */
 Heart::Heart()
     : threadActive(true), thread(&Heart::updateState, this), status(HEART_NORMAL),
-      basePulseTime(milliseconds(1000)), pulseTimeVariance(milliseconds(0)), heartRate(-1)
+      basePulseTime(milliseconds(1000)), pulseTimeVariance(milliseconds(0)), heartRate(-1),
+      distribution(std::uniform_int_distribution<>(0, INT32_MAX))
 {
+    std::random_device rd;
+    gen = std::default_random_engine(rd());
 }
 Heart::~Heart()
 {
@@ -55,73 +57,40 @@ void Heart::shock()
     }
 
 }
-/**
- * missing docs!!!!!!!!!!!!
- * @return
- */
-long long Heart::generatePulseDuration() {
-    return basePulseTime.count() + (pulseTimeVariance.count() * (rand()%2)*(2-1));
+long long Heart::generatePulseDuration() {;
+    long long positive = (distribution(gen)%2)*2-1;
+    long long variance = pulseTimeVariance.count() == 0 ? 0 :
+                         distribution(gen) % (pulseTimeVariance.count()+1) * positive;
+    return basePulseTime.count() + variance;
 }
 void Heart::updateState()
 {
-    long long pulseDuration = generatePulseDuration(); // override this value in the while loop, the default duration between pulses
+    long long pulseDuration = 0; // override this value in the while loop, the default duration between pulses
     const long long tickRate = 100; // milliseconds
 
     auto lastTick = high_resolution_clock::now();
     long long totalElapsedTime = 0;
-    
     bool isRegular = NULL;
-
     auto elapsedTimeSinceLastPulse = 0;
-
     while (threadActive)
     {
-        /**
-         * Manage and update the Heart attributes here.
-         *
-         * I don't think we need mutexes here but watch out for race conditions and potentially
-         * weird behaviour.
-         *
-         * 1. Check if the time until the next pulse has come
-         * 1. Create a new pulse at the back of the array and remove the pulse at the front to maintain a size of 6
-         * 2. Calculate the time until the next pulse (pulseTime +- [0, pulseTimeVariance])
-         * 3. Update the heartRate
-         */
         const auto currentTick = high_resolution_clock::now();
         const auto elapsedTimeSinceLastTick = duration_cast<milliseconds>(currentTick - lastTick).count();
         elapsedTimeSinceLastPulse += elapsedTimeSinceLastTick;
         totalElapsedTime += duration_cast<milliseconds>(currentTick - lastTick).count();
         lastTick = currentTick;
 
-        // iterate through all pulses backwards
-        for (auto it = pulses.rbegin(); it != pulses.rend();)
-        {
-            // Calculate the duration since the pulse was created
-            auto durationSincePulse = duration_cast<seconds>(currentTick.time_since_epoch() - (*it)->getTime());
-
-            // If any pulse is longer than 6 seconds
-            if (durationSincePulse.count() > 6)
-            {
-                // Convert reverse iterator to a normal iterator before erasing
-                auto toErase = std::next(it).base();
-                delete *toErase; // delete the pulse
-                it = std::make_reverse_iterator(pulses.erase(toErase)); // convert back to reverse iterator
-            }
-            else
-            {
-                // ignore the pulse
-                ++it;
-            }
-        }
-
         // Check if it's time for the next pulse
         // compare elapsed time since last pulse to pulse duration
         if (elapsedTimeSinceLastPulse >= pulseDuration)
         {
             elapsedTimeSinceLastPulse = 0;
-            std::cout << "Creating new pulse at: " << std::chrono::duration_cast<std::chrono::milliseconds>(high_resolution_clock::now().time_since_epoch()).count() << " ms" << std::endl;
+            pulseDuration = generatePulseDuration();
+
             // Add a new pulse
-            pulses.push_back(new Pulse(getStatus() == VTACH));
+            milliseconds timestamp = pulses.empty() ? milliseconds(0) : pulses.at(pulses.size()-1)->getTime() + milliseconds(pulseDuration);
+            std::cout << "Creating new pulse at: " << std::chrono::duration_cast<std::chrono::milliseconds>(timestamp).count() << " ms" << std::endl;
+            pulses.push_back(new Pulse(timestamp, getStatus() == VTACH));
 
             // Check regularity
             // -2 to exclude last duration comparison (accesses garbage)
@@ -165,8 +134,8 @@ void Heart::updateState()
                 if(pulses.size() >= 2){
                     heartRate = 300 / (pulses[0]->getTime() - pulses[1]->getTime()).count();
                 }
-                else if(pulses.size() == 1){
-                    heartRate = 10;
+                else {
+                    heartRate = -1;
                 }
             }
             else
@@ -174,6 +143,24 @@ void Heart::updateState()
                 status = VFIB; // commenting this out makes heartNormalStatusTest to pass but status wrong for heartVfibTest
                 // Use 6-second method to calculate heart rate
                 heartRate = pulses.size() * 10;
+            }
+        }
+
+        // remove pulses that are longer than 6 seconds
+        for (auto it = pulses.rbegin(); it != pulses.rend();)
+        {
+            auto durationSincePulse = duration_cast<seconds>(milliseconds (totalElapsedTime)- (*it)->getTime());
+            if (durationSincePulse.count() > 6)
+            {
+                // Convert reverse iterator to a normal iterator before erasing
+                auto toErase = std::next(it).base();
+                delete *toErase; // delete the pulse
+                it = std::make_reverse_iterator(pulses.erase(toErase)); // convert back to reverse iterator
+            }
+            else
+            {
+                // ignore the pulse
+                ++it;
             }
         }
 
