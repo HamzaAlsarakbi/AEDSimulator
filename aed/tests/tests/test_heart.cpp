@@ -21,6 +21,8 @@ TEST(HeartTest, heartPulseGenerator) {
 }
 TEST(HeartTest, heartNormalStatusTest) {
     Heart heart;
+    heart.setBasePulseTime(1000);
+    heart.setPulseTimeVariance(0);
 
     // Let the heart update for a while (aka put the test thread to sleep)
     std::cout << "waiting for pulses" << std::endl;
@@ -30,6 +32,19 @@ TEST(HeartTest, heartNormalStatusTest) {
     ASSERT_EQ(heart.getHeartRate(), 60); // Assert heart rate is positive or as expected
 }
 
+TEST(HeartTest, heartNormalStatusTest120) {
+    Heart heart;
+    heart.setBasePulseTime(500);
+    heart.setPulseTimeVariance(0);
+
+    // Let the heart update for a while (aka put the test thread to sleep)
+    std::cout << "waiting for pulses" << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds (6050));
+
+    ASSERT_EQ(heart.getStatus(), HEART_NORMAL);  // Expected status after running for a while
+    ASSERT_EQ(heart.getHeartRate(), 120); // Assert heart rate is positive or as expected
+}
+
 TEST(HeartTest, heartVfibStatusTest) {
     Heart heart;
 
@@ -37,9 +52,7 @@ TEST(HeartTest, heartVfibStatusTest) {
 
     // Let the heart update for a while (aka put the test thread to sleep)
     std::cout << "waiting for pulses" << std::endl;
-    while(heart.getPulsesCount() < 6) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(6050));
 
     ASSERT_EQ(heart.getStatus(), VFIB);  // Expected status after running for a while
     std::cout << heart.getHeartRate() << std::endl; // Assert heart rate is positive or as expected
@@ -53,9 +66,7 @@ TEST(HeartTest, heartVtachStatusTest) {
 
     // Let the heart update for a while (aka put the test thread to sleep)
     std::cout << "waiting for pulses" << std::endl;
-    while(heart.getPulsesCount() < 6) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(6050));
 
     ASSERT_EQ(heart.getStatus(), VTACH);  // Expected status after running for a while
     ASSERT_EQ(heart.getHeartRate(), 120); // Assert heart rate is positive or as expected

@@ -94,24 +94,19 @@ void Heart::updateState()
 
             // Check regularity
             // -2 to exclude last duration comparison (accesses garbage)
-            if(pulses.size() >= 2){
-                for (int j = 0; j < pulses.size() - 1; j++) {
+            if(pulses.size() > 1){
+                long long diff = pulses[1]->getTime().count() - pulses[0]->getTime().count();
+                long long maxPt = diff;
+                long long minPt = maxPt;
+                for (int j = 2; j < pulses.size(); j++) {
+                    diff = pulses[j]->getTime().count() - pulses[j-1]->getTime().count();
                     // Convert nanoseconds to milliseconds before calculating the difference
-                    long long pulseTime1 = duration_cast<milliseconds>(nanoseconds(pulses[j]->getTime())).count();
-                    long long pulseTime2 = duration_cast<milliseconds>(nanoseconds(pulses[j + 1]->getTime())).count();
-
-                    // compare two pulses at a time
-                    // check the difference in duration
-                    long long pulseDurationDiff = pulseTime2 - pulseTime1;
-
-                    std::cout << "Pulse Duration Difference: " << pulseDurationDiff << " ms" << std::endl;
-
-                    // Define upper and lower limits for pulse duration
-                    long long upperPulseLim = pulseDuration + 40;
-                    long long lowerPulseLim = pulseDuration - 40;
-
-                    // Check if duration is within limits
-                    isRegular = pulseDurationDiff <= upperPulseLim && pulseDurationDiff >= lowerPulseLim;
+                    maxPt = diff > maxPt ? diff : maxPt;
+                    minPt = diff < minPt ? diff : minPt;
+                }
+                isRegular = (maxPt - minPt) == 0;
+                if(!isRegular){
+                    std::cout << "Pulse is not regular " << std::endl;
                 }
             }
             else{
@@ -132,7 +127,7 @@ void Heart::updateState()
             {
                 // Use big-box method to calculate heart rate
                 if(pulses.size() >= 2){
-                    heartRate = 300 / (pulses[0]->getTime() - pulses[1]->getTime()).count();
+                    heartRate = 60000 / (pulses[1]->getTime() - pulses[0]->getTime()).count();
                 }
                 else {
                     heartRate = -1;
