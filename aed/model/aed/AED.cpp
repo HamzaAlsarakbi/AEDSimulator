@@ -37,11 +37,12 @@ AED::~AED(){
 void AED::resetBattery() {
     setBattery(100);
     if(status != AED_BATTERY_DEAD) return;
+    if(status == AED_OFF) return;
     emit initSelfTest();
-    
 }
 
 void AED::setPadPlacement(ConnectionStatus connection) {
+    if(status == AED_OFF) return;
     this->connection = connection;
     emit handleAttachPads();
 }
@@ -53,6 +54,7 @@ void AED::handleTurnOn() {
     emit initSelfTest();
 }
 void AED::handleSelfTest() {
+    if(status == AED_OFF) return;
     if (!doesTestFail){
         status = UNIT_OK;
         emit initCheckResponsiveness();
@@ -82,6 +84,7 @@ void AED::handleTurnOff() {
     emit update(status);
 }
 void AED::handleCheckResponsiveness() {
+    if(status == AED_OFF) return;
     status = CHECK_RESPONSIVENESS;
     if (battery == 0){emit initChangeBattery();}
     else {
@@ -90,6 +93,7 @@ void AED::handleCheckResponsiveness() {
     emit update(status);
 }
 void AED::handleCallHelp() {
+    if(status == AED_OFF) return;
     status = CALL_HELP;
     if (battery == 0){emit initChangeBattery();}
     else {
@@ -98,27 +102,24 @@ void AED::handleCallHelp() {
     emit update(status);
 }
 void AED::handleAttachPads() {
+    if(status == AED_OFF) return;
     battery--;
     status = ATTACH_PADS;
-    if (battery == 0){emit initChangeBattery();}
-    else {
-        if(connection == GOOD) {
-            emit initTypeOfPads();
-            emit update(status);
-            return;
-        }
-        else if (connection == BAD) {
-            emit initCheckConnection();
-            emit update(status);
-            return;
-        }
-        else {
-            emit initAttachPads();
-        }
+    if (battery == 0) {
+        emit initChangeBattery();
+        return;
+    }
+    if(connection == GOOD) {
+        emit initTypeOfPads();
+    } else if (connection == BAD) {
+        emit initCheckConnection();
+    } else {
+        emit initAttachPads();
     }
     emit update(status);
 }
 void AED::handleCheckConnection() {
+    if(status == AED_OFF) return;
     battery--;
     if (connection != GOOD) {
         std::cout << "todo emit signal to set display to CHECK CONNECTION" << std::endl;
@@ -130,6 +131,7 @@ void AED::handleCheckConnection() {
     emit update(status);
 }
 void AED::handleTypeOfPads() {
+    if(status == AED_OFF) return;
     /*
     if (patient->getAge() <= 8) {std::cout << "todo emit signal to set display to CHILD PADS" << std::endl;}
     else {std::cout << "todo emit signal to set display to ADULT PADS" << std::endl;}
@@ -139,17 +141,20 @@ void AED::handleTypeOfPads() {
     emit update(status);
 }
 void AED::handleDontTouchPatient() {
+    if(status == AED_OFF) return;
     battery -= 4;
     status = DONT_TOUCH_PATIENT;
     emit initStartCpr();
     emit update(status);
 }
 void AED::handleStartCpr() {
+    if(status == AED_OFF) return;
     status = START_CPR;
     emit update(status);
 }
 
 void AED::cpr(double depth) {
+    if(status == AED_OFF) return;
     battery--;
     std::cout << "todo pass depth to Patient class from AED::cpr(...)" << std::endl;
 }
@@ -157,6 +162,7 @@ void AED::cpr(double depth) {
  * Administers a shock
  */
 void AED::shock() {
+    if(status == AED_OFF) return;
     shocks++;
     battery -= 10;
     std::cout << "todo pass shock() invokation to Patient class from AED::shock()" << std::endl;

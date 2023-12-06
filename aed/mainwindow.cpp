@@ -32,7 +32,7 @@ void MainWindow::connectUI() {
 
     // Buttonss
     connect(ui->turnOnButton, &QPushButton::pressed, this, &MainWindow::turnOnHandler);
-    connect(ui->turnOffButton, &QPushButton::pressed, this, &MainWindow::turnOffHandler);
+    connect(ui->turnOffButton, SIGNAL(pressed()), aedDevice, SLOT(handleTurnOff()));
     connect(ui->changeBatteriesButton, &QPushButton::pressed, this, &MainWindow::changeBatteriesHandler);
     connect(ui->attachDefibPadsCorrectlyButton, &QPushButton::pressed, this, &MainWindow::padsCorrectHandler);
     connect(ui->attachDefibPadsIncorrectlyButton, &QPushButton::pressed, this, &MainWindow::padsIncorrectHandler);
@@ -52,7 +52,7 @@ void MainWindow::update(AEDStatus status) {
     ui->batteryLabel->setText(status == AED_OFF ? "" : QString::fromStdString(std::to_string(aedDevice->getBattery()) + "%"));
     ui->shocksCount->setText(status == AED_OFF ? "" : QString::number(aedDevice->getShocksCount()));
 //    AED Lights
-    ui->testPassIndicator->setStyleSheet(aedDevice->isPassing() ? "background-color: green" : "background-color: red");
+    ui->testPassIndicator->setStyleSheet(status == AED_OFF || status == AED_ON ? "background-color: gray" : aedDevice->isPassing() ? "background-color: green" : "background-color: red");
     for(int i = 0; i < indicators.size(); i++) {
         indicators.at(i)->setStyleSheet(i == (status-6) ? "background-color: green" : "background-color: gray");
     }
@@ -82,11 +82,9 @@ void MainWindow::batterySliderHandler(int value) {
 
 void MainWindow::baseDepthSliderHandler(int value) {
     ui->baseDepthLabel->setText(QString::number(value / 100.0, 'f', 2));
-    std::cout << "todo MainWindow::baseDepthSliderHandler(value: " << value << ")" << std::endl;
 }
 void MainWindow::baseDepthVarianceSliderHandler(int value) {
     ui->baseDepthVarianceLabel->setText(QString::number(value / 100.0, 'f', 2));
-    std::cout << "todo MainWindow::baseDepthVarianceSliderHandler(value: " << value << ")" << std::endl;
 }
 void MainWindow::ageSliderHandler(int value) {
     ui->ageLabel->setText(QString::number(value, 'd', 0));
@@ -103,10 +101,6 @@ void MainWindow::qrsWidthVarianceSliderHandler(int value) {
 
 void MainWindow::turnOnHandler(){
     emit aedDevice->initTurnOn();
-}
-
-void MainWindow::turnOffHandler(){
-    std::cout << "todo MainWindow::turnOffHandler()" << std::endl;
 }
 
 void MainWindow::changeBatteriesHandler(){

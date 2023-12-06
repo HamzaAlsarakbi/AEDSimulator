@@ -25,7 +25,6 @@ public slots:
     void qrsWidthVarianceSliderHandler(int value);
     
     void turnOnHandler();
-    void turnOffHandler();
     void changeBatteriesHandler();
     void padsCorrectHandler();
     void padsIncorrectHandler();
