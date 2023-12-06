@@ -55,10 +55,9 @@ void MainWindow::update(AEDStatus status) {
     ui->testPassIndicator->setStyleSheet(aedDevice->isPassing() ? "background-color: green" : "background-color: red");
     for(int i = 0; i < indicators.size(); i++) {
         indicators.at(i)->setStyleSheet(i == (status-6) ? "background-color: green" : "background-color: gray");
-        std::cout << "i: " << i << ", status+6: " << status-6 << ", status: " << displayStrings.at(status).toStdString() <<  std::endl;
     }
-
-
+    ui->padsConnectedIndicator->setStyleSheet(aedDevice->getConnectionStatus() == GOOD ? "background-color: green" :
+    aedDevice->getConnectionStatus() == BAD ? "background-color: red" : "background-color: gray");
 
 //    Rescuer Controls
     ui->batterySlider->setValue(aedDevice->getBattery());

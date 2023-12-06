@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/attachPads.png</file>
+        <file>img/callForHelp.png</file>
+        <file>img/checkResponsiveness.png</file>
+        <file>img/dontTouchPatient.png</file>
+        <file>img/heart.png</file>
+        <file>img/startCpr.png</file>
+    </qresource>
+</RCC>
