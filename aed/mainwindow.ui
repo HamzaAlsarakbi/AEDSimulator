@@ -755,6 +755,19 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QPushButton" name="failTestButton">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Fail Test</string>
+              </property>
+              <property name="flat">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
          </layout>
@@ -1100,19 +1113,6 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="failTestButton">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="text">
-                 <string>Fail Test</string>
-                </property>
-                <property name="flat">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
                <widget class="QPushButton" name="administerShockButton">
                 <property name="enabled">
                  <bool>true</bool>
@@ -1395,6 +1395,9 @@
            <layout class="QHBoxLayout" name="horizontalLayout_24">
             <item>
              <widget class="QCheckBox" name="vtachCheckbox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>VTach</string>
               </property>
@@ -1416,7 +1419,7 @@
      <x>0</x>
      <y>0</y>
      <width>1091</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

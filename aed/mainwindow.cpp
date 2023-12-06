@@ -36,6 +36,7 @@ void MainWindow::connectUI() {
     connect(ui->changeBatteriesButton, &QPushButton::pressed, this, &MainWindow::changeBatteriesHandler);
     connect(ui->attachDefibPadsCorrectlyButton, &QPushButton::pressed, this, &MainWindow::padsCorrectHandler);
     connect(ui->attachDefibPadsIncorrectlyButton, &QPushButton::pressed, this, &MainWindow::padsIncorrectHandler);
+    connect(ui->failTestButton, &QPushButton::pressed, this, &MainWindow::failTestHandler);
     connect(ui->administerShockButton, &QPushButton::pressed, this, &MainWindow::administerShockHandler);
     connect(ui->cprButton, &QPushButton::pressed, this, &MainWindow::cprHandler);
     connect(aedDevice, SIGNAL(update(AEDStatus)), this, SLOT(update(AEDStatus)));
@@ -48,6 +49,7 @@ void MainWindow::update(AEDStatus status) {
 //    AED Controls
     ui->turnOnButton->setDisabled(status != AED_OFF);
     ui->turnOffButton->setDisabled(status == AED_OFF);
+    ui->failTestButton->setDisabled(status != AED_ON && status != AED_OFF);
 //    AED Screen
     ui->batteryLabel->setText(status == AED_OFF ? "" : QString::fromStdString(std::to_string(aedDevice->getBattery()) + "%"));
     ui->shocksCount->setText(status == AED_OFF ? "" : QString::number(aedDevice->getShocksCount()));
@@ -64,7 +66,6 @@ void MainWindow::update(AEDStatus status) {
     ui->changeBatteriesButton->setVisible(false);
     ui->attachDefibPadsCorrectlyButton->setVisible(status == ATTACH_PADS && aedDevice->getConnectionStatus() != GOOD);
     ui->attachDefibPadsIncorrectlyButton->setVisible(status == ATTACH_PADS && aedDevice->getConnectionStatus() == NONE);
-    ui->failTestButton->setDisabled(status != AED_ON);
     ui->administerShockButton->setVisible(status == SHOCK_ADVISED);
     ui->cprButton->setVisible(status == START_CPR);
 
@@ -137,10 +138,6 @@ void MainWindow::cprHandler(){
 }
 
 void MainWindow::failTestHandler(){
-    if (aedDevice->isPassing()){
-        aedDevice->setTestFail(true);
-        std::cout << "Self Test will fail" << std::endl;}
-    else {
-        aedDevice->setTestFail(false);
-        std::cout << "self Test will succeed" << std::endl;}
+    aedDevice->setTestFail(aedDevice->isPassing());
+    ui->failTestButton->setText(aedDevice->isPassing() ? "Fail Test" : "Pass Test");
 }

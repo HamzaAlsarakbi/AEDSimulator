@@ -61,7 +61,6 @@ void AED::handleSelfTest() {
     }
     else {
         status = AED_TEST_FAIL;
-        std::cout << "todo emit signal to set display to TEST FAIL" << std::endl;
     }
     emit update(status);
 }
