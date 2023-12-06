@@ -27,8 +27,13 @@ add_library(heart
     model/patient/heart/Heart.h
 )
 
+add_library(patient
+    model/patient/Patient.cpp
+    model/patient/Patient.h
+)
+
 # Link pulse library with heart library
-target_link_libraries(heart pulse)
+target_link_libraries(patient heart pulse)
 
 add_executable(aed
     main.cpp
@@ -47,4 +52,4 @@ add_executable(aed
     model/aed/step/Step.cpp)
 
 # Link pulse and heart libraries with the executable
-target_link_libraries(aed heart pulse Qt6::Widgets Qt6::Core Qt6::Quick)
+target_link_libraries(aed patient heart pulse Qt6::Widgets Qt6::Core Qt6::Quick)

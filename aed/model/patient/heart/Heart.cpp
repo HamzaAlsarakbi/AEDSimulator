@@ -26,30 +26,30 @@ Heart::~Heart()
     }
 }
 
-void Heart::setVtach()
+void Heart::setVtach(bool vtach)
 {
-    if (status == VFIB)
-        return;
-    status = VTACH;
-}
-
-void Heart::resetVtach()
-{
-    if (status == VFIB)
-        return;
-    status = HEART_NORMAL;
+    if(vtach) {
+        if (status == VFIB)
+            return;
+        status = VTACH;
+    } else {
+        if (status == VFIB)
+            return;
+        status = HEART_NORMAL;
+    }
 }
 
 /**
- * Missing documentation!
+ *  Administers shock
  */
 void Heart::shock()
 {
-    setBasePulseTime(1000); // set to default
     if(status == VTACH){
-        resetVtach();
+        setBasePulseTime(1621); // set to around 37bpm, for CPR later
+        setVtach(false);
     }
     else if(status == VFIB){
+        setBasePulseTime(1621); // set to around 37bpm, for CPR later
         setPulseTimeVariance(0); // set to regular rhythm
     }
     else{
@@ -114,7 +114,7 @@ void Heart::updateState()
                     isRegular = true;
 
                     if(this->getStatus() == VTACH){
-                        setVtach();
+                        setVtach(true);
                     }
                 }
                 else{
@@ -162,4 +162,12 @@ void Heart::updateState()
         // Wait until the next tick
         std::this_thread::sleep_for(std::chrono::milliseconds(tickRate));
     }
+}
+
+void Heart::clearPulses() {
+    while(!pulses.empty()) {
+        delete pulses.at(pulses.size() - 1);
+        pulses.pop_back();
+    }
+    heartRate = -1;
 }
