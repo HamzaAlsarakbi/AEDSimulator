@@ -32,6 +32,7 @@ public slots:
     void administerShockHandler();
     void cprHandler();
     void failTestHandler();
+    void update(AEDStatus status);
 
 private:
     Ui::MainWindow *ui;

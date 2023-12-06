@@ -12,16 +12,18 @@ using namespace std;
 
 enum AEDStatus {
     AED_ON,
+    AED_OFF,
+    AED_BATTERY_DEAD,
+    CHANGE_BATTERY,
+    AED_TEST_FAIL,
     UNIT_OK,
     CHECK_RESPONSIVENESS,
-    CHANGE_BATTERY,
     CALL_HELP,
     ATTACH_PADS,
     DONT_TOUCH_PATIENT,
+    SHOCK_ADVISED,
+    SHOCK_NOT_ADVISED,
     START_CPR,
-    AED_OFF,
-    AED_BATTERY_DEAD,
-    AED_TEST_FAIL
 };
 
 enum ConnectionStatus {
@@ -35,12 +37,15 @@ public:
     AED();
     ~AED();
     // Getters and setters
-    void setBattery(int battery);
-    void setLastCompressDepth(double depth);
-    void setTestFail(bool state);
+    AEDStatus getStatus() { return status; }
+    ConnectionStatus getConnectionStatus() { return connection; }
+    int getBattery() { return battery; }
+    int getShocksCount() { return shocks; }
+    bool isPassing() { return !doesTestFail; }
+    void setBattery(int battery) { this->battery = battery; }
+    void setTestFail(bool state) { doesTestFail = state; }
     void setPadPlacement(ConnectionStatus status);
-    bool getTestFail();
-    int getBattery();
+    void cpr(double depth);
 
     // Test-related functions
     //void startSelfTest();
@@ -48,15 +53,15 @@ public:
 
     // AED steps
     void turnOff();
-    void turnOn();  // Initiates self-test
     void resetBattery();
-    void updateState();
+    void shock();
 
 private:
     QThread thread;
     bool threadActive;
     AEDStatus status;
     int battery;
+    int shocks;
     bool doesTestFail = false;
     // Patient* patient;
     ConnectionStatus connection;
@@ -86,6 +91,7 @@ signals:
     void initTypeOfPads();
     void initDontTouchPatient();
     void initStartCpr();
+    void update(AEDStatus state);
 
 };
 

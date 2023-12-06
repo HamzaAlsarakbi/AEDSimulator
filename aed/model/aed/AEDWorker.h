@@ -12,49 +12,50 @@ public:
     using WaitCallback = std::function<void()>;
 
 private:
-    const unsigned long stepDuration = 2;
-    const unsigned long testDuration = 2;
-    const unsigned long turnOnDuration = 2;
+    // milliseconds
+    const unsigned long stepDuration = 1000;
+    const unsigned long testDuration = 1000;
+    const unsigned long turnOnDuration = 1000;
 
 public slots:
     void waitTurnOn() {
-        QThread::sleep(turnOnDuration);
+        QThread::msleep(turnOnDuration);
         emit readyTurnOn();
     }
     void waitSelfTest() {
-        QThread::sleep(testDuration);
+        QThread::msleep(testDuration);
         emit readySelfTest();
     }
     void waitCheckResponsiveness() {
-        QThread::sleep(stepDuration);
+        QThread::msleep(stepDuration);
         emit readyCheckResponsiveness();
     }
     void waitCallHelp() {
-        QThread::sleep(stepDuration);
+        QThread::msleep(stepDuration);
         emit readyCallHelp();
     }
     void waitAttachPads() {
-        QThread::sleep(stepDuration);
+        QThread::msleep(stepDuration);
         emit readyAttachPads();
     }
     void waitCheckConnection() {
-        QThread::sleep(stepDuration);
+        QThread::msleep(stepDuration);
         emit readyCheckConnection();
     }
     void waitTypeOfPads() {
-        QThread::sleep(stepDuration);
+        QThread::msleep(stepDuration);
         emit readyTypeOfPads();
     }
     void waitDontTouchPatient() {
-        QThread::sleep(stepDuration);
+        QThread::msleep(stepDuration);
         emit readyDontTouchPatient();
     }
     void waitStartCpr() {
-        QThread::sleep(stepDuration);
+        QThread::msleep(stepDuration);
         emit readyStartCpr();
     }
     void waitChangeBattery()    {
-        QThread::sleep(stepDuration);
+        QThread::msleep(stepDuration);
         emit readyChangeBattery();
     }
 

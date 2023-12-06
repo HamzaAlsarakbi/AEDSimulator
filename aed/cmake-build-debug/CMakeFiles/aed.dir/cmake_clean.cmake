@@ -1,7 +1,4 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/aed_autogen.dir/AutogenUsed.txt"
-  "CMakeFiles/aed_autogen.dir/ParseCache.txt"
-  "aed_autogen"
   "CMakeFiles/aed.dir/aed_autogen/mocs_compilation.cpp.obj"
   "CMakeFiles/aed.dir/aed_autogen/mocs_compilation.cpp.obj.d"
   "CMakeFiles/aed.dir/main.cpp.obj"
@@ -22,6 +19,9 @@ file(REMOVE_RECURSE
   "CMakeFiles/aed.dir/model/patient/heart/Heart.cpp.obj.d"
   "CMakeFiles/aed.dir/model/patient/heart/pulse/Pulse.cpp.obj"
   "CMakeFiles/aed.dir/model/patient/heart/pulse/Pulse.cpp.obj.d"
+  "CMakeFiles/aed_autogen.dir/AutogenUsed.txt"
+  "CMakeFiles/aed_autogen.dir/ParseCache.txt"
+  "aed_autogen"
   "aed.exe"
   "aed.exe.manifest"
   "aed.pdb"
