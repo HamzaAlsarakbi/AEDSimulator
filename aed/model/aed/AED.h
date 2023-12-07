@@ -6,7 +6,7 @@
 #include <QThread>
 #include <vector>
 #include "AEDWorker.h"
-//#include "../model/patient/Patient.h"
+#include "../patient/Patient.h"
 
 using namespace std;
 
@@ -24,6 +24,7 @@ enum AEDStatus {
     SHOCK_ADVISED,
     SHOCK_NOT_ADVISED,
     START_CPR,
+    AED_PATIENT_HEALTHY
 };
 
 enum ConnectionStatus {
@@ -39,9 +40,11 @@ public:
     // Getters and setters
     AEDStatus getStatus() { return status; }
     ConnectionStatus getConnectionStatus() { return connection; }
-    int getBattery() { return battery; }
-    int getShocksCount() { return shocks; }
-    bool isPassing() { return !doesTestFail; }
+    int getBattery() const { return battery; }
+    int getShocksCount() const { return shocks; }
+    bool isPassing() const { return !doesTestFail; }
+    int getMinCompressionDepth() const { return patient->getMinCompressionDepth(); }
+    int getMaxCompressionDepth() const { return patient->getMaxCompressionDepth(); }
     void setBattery(int battery) { this->battery = battery; }
     void setTestFail(bool state) { doesTestFail = state; }
     void setPadPlacement(ConnectionStatus status);
@@ -63,7 +66,7 @@ private:
     int battery;
     int shocks;
     bool doesTestFail = false;
-    // Patient* patient;
+    Patient* patient;
     ConnectionStatus connection;
     double lastCompressionDepth;
 
@@ -79,6 +82,8 @@ public slots:
     void handleTypeOfPads();
     void handleDontTouchPatient();
     void handleStartCpr();
+    void handleShockAdvised();
+    void handlePatientHealthy();
 
 signals:
     void initTurnOn();
@@ -91,7 +96,11 @@ signals:
     void initTypeOfPads();
     void initDontTouchPatient();
     void initStartCpr();
+    void initShockAdvised();
+    void initShockNotAdvised();
+    void initPatientHealthy();
     void update(AEDStatus state);
+    void updateDisplay(std::string text);
 
 };
 

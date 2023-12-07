@@ -32,6 +32,7 @@ public slots:
     void cprHandler();
     void failTestHandler();
     void update(AEDStatus status);
+    void updateDisplay(std::string text);
 
 private:
     Ui::MainWindow *ui;

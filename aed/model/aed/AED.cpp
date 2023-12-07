@@ -1,7 +1,9 @@
 #include "AED.h"
 
 AED::AED()
-: battery(100), status(AED_OFF), connection(NONE), lastCompressionDepth(-1.0), shocks(0) {
+: battery(100), status(AED_OFF), connection(NONE), lastCompressionDepth(-1.0), shocks(0),
+patient(new Patient(PSC_HEART_ATTACK))
+{
     AEDWorker* worker = new AEDWorker;
     worker->moveToThread(&workerThread);
     connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
@@ -14,6 +16,8 @@ AED::AED()
     connect(this, &AED::initTypeOfPads, worker, &AEDWorker::waitTypeOfPads);
     connect(this, &AED::initDontTouchPatient, worker, &AEDWorker::waitDontTouchPatient);
     connect(this, &AED::initStartCpr, worker, &AEDWorker::waitStartCpr);
+    connect(this, &AED::initShockAdvised, worker, &AEDWorker::waitShockAdvised);
+    connect(this, &AED::initPatientHealthy, worker, &AEDWorker::waitPatientHealthy);
     connect(this, &AED::initChangeBattery, worker, &AEDWorker::waitChangeBattery);
 
     connect(worker, &AEDWorker::readyTurnOn, this, &AED::handleTurnOn);
@@ -26,12 +30,15 @@ AED::AED()
     connect(worker, &AEDWorker::readyTypeOfPads, this, &AED::handleTypeOfPads);
     connect(worker, &AEDWorker::readyDontTouchPatient, this, &AED::handleDontTouchPatient);
     connect(worker, &AEDWorker::readyStartCpr, this, &AED::handleStartCpr);
+    connect(worker, &AEDWorker::readyShockAdvised, this, &AED::handleShockAdvised);
+    connect(worker, &AEDWorker::readyPatientHealthy, this, &AED::handlePatientHealthy);
     workerThread.start();
 }
 
 AED::~AED(){
     workerThread.quit();
     workerThread.wait();
+    delete patient;
 }
 
 void AED::resetBattery() {
@@ -66,7 +73,6 @@ void AED::handleSelfTest() {
 }
 void AED::handleChangeBattery() {
     if (battery == 0) {
-        std::cout << "todo emit signal to set display to CHANGE BATTERIES" << std::endl;
         status = CHANGE_BATTERY;
         emit initChangeBattery();
     }
@@ -121,21 +127,17 @@ void AED::handleCheckConnection() {
     if(status == AED_OFF) return;
     battery--;
     if (connection != GOOD) {
-        std::cout << "todo emit signal to set display to CHECK CONNECTION" << std::endl;
+        emit updateDisplay("CHECK CONNECTION HABIBI");
         emit initCheckConnection();
     }
     else {
         emit initTypeOfPads();
+        emit update(status);
+        emit updateDisplay(patient->getAge() < 8 ? "CHILD PADZ" : "ADULT PADZ");
     }
-    emit update(status);
 }
 void AED::handleTypeOfPads() {
     if(status == AED_OFF) return;
-    /*
-    if (patient->getAge() <= 8) {std::cout << "todo emit signal to set display to CHILD PADS" << std::endl;}
-    else {std::cout << "todo emit signal to set display to ADULT PADS" << std::endl;}
-    */
-    std::cout << "Will display type of pads" << std::endl;
     emit initDontTouchPatient();
     emit update(status);
 }
@@ -143,7 +145,16 @@ void AED::handleDontTouchPatient() {
     if(status == AED_OFF) return;
     battery -= 4;
     status = DONT_TOUCH_PATIENT;
-    emit initStartCpr();
+    // keep checking until you have a proper heart rate
+    if(patient->getHeartRate() == -1) {
+        emit initDontTouchPatient();
+    } else if(patient->shockable()) {
+        emit initShockAdvised();
+    } else if (patient->cprAble()) {
+        emit initStartCpr();
+    } else {
+        emit initPatientHealthy();
+    }
     emit update(status);
 }
 void AED::handleStartCpr() {
@@ -151,10 +162,22 @@ void AED::handleStartCpr() {
     status = START_CPR;
     emit update(status);
 }
+void AED::handleShockAdvised() {
+    if(status == AED_OFF) return;
+    status = SHOCK_ADVISED;
+    emit update(status);
+}
+void AED::handlePatientHealthy() {
+    if(status == AED_OFF) return;
+    status = AED_PATIENT_HEALTHY;
+    emit update(status);
+}
+
 
 void AED::cpr(double depth) {
     if(status == AED_OFF) return;
     battery--;
+    patient->cpr(depth);
     std::cout << "todo pass depth to Patient class from AED::cpr(...)" << std::endl;
 }
 /**

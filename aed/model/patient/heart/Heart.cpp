@@ -70,7 +70,7 @@ void Heart::updateState()
 
     auto lastTick = high_resolution_clock::now();
     long long totalElapsedTime = 0;
-    bool isRegular = NULL;
+    bool isRegular = false;
     auto elapsedTimeSinceLastPulse = 0;
     while (threadActive)
     {
@@ -89,7 +89,7 @@ void Heart::updateState()
 
             // Add a new pulse
             milliseconds timestamp = pulses.empty() ? milliseconds(0) : pulses.at(pulses.size()-1)->getTime() + milliseconds(pulseDuration);
-            std::cout << "Creating new pulse at: " << std::chrono::duration_cast<std::chrono::milliseconds>(timestamp).count() << " ms" << std::endl;
+//            std::cout << "Creating new pulse at: " << std::chrono::duration_cast<std::chrono::milliseconds>(timestamp).count() << " ms" << std::endl;
             pulses.push_back(new Pulse(timestamp, getStatus() == VTACH));
 
             // Check regularity
@@ -98,7 +98,7 @@ void Heart::updateState()
                 long long diff = pulses[1]->getTime().count() - pulses[0]->getTime().count();
                 long long maxPt = diff;
                 long long minPt = maxPt;
-                for (int j = 2; j < pulses.size(); j++) {
+                for (unsigned long j = 2; j < pulses.size(); j++) {
                     diff = pulses[j]->getTime().count() - pulses[j-1]->getTime().count();
                     // Convert nanoseconds to milliseconds before calculating the difference
                     maxPt = diff > maxPt ? diff : maxPt;
@@ -106,7 +106,7 @@ void Heart::updateState()
                 }
                 isRegular = (maxPt - minPt) == 0;
                 if(!isRegular){
-                    std::cout << "Pulse is not regular " << std::endl;
+//                    std::cout << "Pulse is not regular " << std::endl;
                 }
             }
             else{
@@ -141,22 +141,12 @@ void Heart::updateState()
             }
         }
 
-        // remove pulses that are longer than 6 seconds
-        for (auto it = pulses.rbegin(); it != pulses.rend();)
-        {
-            auto durationSincePulse = duration_cast<seconds>(milliseconds (totalElapsedTime)- (*it)->getTime());
-            if (durationSincePulse.count() > 6)
-            {
-                // Convert reverse iterator to a normal iterator before erasing
-                auto toErase = std::next(it).base();
-                delete *toErase; // delete the pulse
-                it = std::make_reverse_iterator(pulses.erase(toErase)); // convert back to reverse iterator
-            }
-            else
-            {
-                // ignore the pulse
-                ++it;
-            }
+        while(!pulses.empty()) {
+            Pulse* curPulse = pulses.at(0);
+            auto durationSincePulse = duration_cast<seconds>(milliseconds (totalElapsedTime)- curPulse->getTime());
+            if (durationSincePulse.count() < 6) break;
+            delete curPulse;
+            pulses.erase(pulses.begin());
         }
 
         // Wait until the next tick

@@ -40,9 +40,10 @@ void MainWindow::connectUI() {
     connect(ui->administerShockButton, &QPushButton::pressed, this, &MainWindow::administerShockHandler);
     connect(ui->cprButton, &QPushButton::pressed, this, &MainWindow::cprHandler);
     connect(aedDevice, SIGNAL(update(AEDStatus)), this, SLOT(update(AEDStatus)));
+    connect(aedDevice, SIGNAL(updateDisplay(std::string)), this, SLOT(updateDisplay(std::string)));
 }
 void MainWindow::update(AEDStatus status) {
-    std::vector<QString> displayStrings = { "TURNING ON", "", "BATTERY DEAD", "CHANGE BATTERY", "TEST FAIL", "UNIT OK", "CHECK RESPONSIVENESS", "CALL HELP", "ATTACH PADS TO PATIENT'S CHEST", "DON'T TOUCH PATIENT, ANALYZING", "SHOCK ADVISED", "SHOCK NOT ADVISED", "START CPR" };
+    std::vector<QString> displayStrings = { "TURNING ON", "", "BATTERY DEAD", "CHANGE BATTERY", "TEST FAIL", "UNIT OK", "CHECK RESPONSIVENESS", "CALL HELP", "ATTACH PADS TO PATIENT'S CHEST", "DON'T TOUCH PATIENT, ANALYZING", "SHOCK ADVISED", "SHOCK NOT ADVISED", "START CPR", "PATIENT HEALTHY" };
     std::vector<QFrame*> indicators = { ui->indicator1, ui->indicator2, ui->indicator3, ui->indicator4, ui->indicator5 };
     ui->displayLabel->setText(displayStrings.at(status));
 
@@ -75,6 +76,12 @@ void MainWindow::update(AEDStatus status) {
     ui->qrsWidthVarianceWidget->setVisible(aedDevice->getConnectionStatus() == GOOD);
     ui->vtachWidget->setVisible(aedDevice->getConnectionStatus() == GOOD);
 }
+
+void MainWindow::updateDisplay(std::string text) {
+    std::cout << "sho habibi? " << text << std::endl;
+    ui->displayLabel->setText(QString::fromStdString(text));
+}
+
 void MainWindow::batterySliderHandler(int value) {
     aedDevice->setBattery(value);
     ui->batterySliderLabel->setText(QString::number(value, 'd', 0));
@@ -129,8 +136,8 @@ void MainWindow::cprHandler(){
     int actualDepth = ui->baseDepthSlider->value() + variance;
     aedDevice->cpr(actualDepth);
     std::cout << "todo get min and max depth values in MainWindow::cprHandler() from Patient values" << std::endl;
-    int min = 200;
-    int max = 240;
+    int min = aedDevice->getMinCompressionDepth();
+    int max = aedDevice->getMaxCompressionDepth();
     max -= min;
     actualDepth -= min;
     double translatedDepth = (100.0/max) * actualDepth;

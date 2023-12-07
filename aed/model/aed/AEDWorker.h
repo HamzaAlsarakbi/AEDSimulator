@@ -54,6 +54,14 @@ public slots:
         QThread::msleep(stepDuration);
         emit readyStartCpr();
     }
+    void waitShockAdvised() {
+        QThread::msleep(stepDuration);
+        emit readyShockAdvised();
+    }
+    void waitPatientHealthy() {
+        QThread::msleep(stepDuration);
+        emit readyPatientHealthy();
+    }
     void waitChangeBattery()    {
         QThread::msleep(stepDuration);
         emit readyChangeBattery();
@@ -70,6 +78,8 @@ signals:
     void readyTypeOfPads();
     void readyDontTouchPatient();
     void readyStartCpr();
+    void readyShockAdvised();
+    void readyPatientHealthy();
 };
 
 #endif

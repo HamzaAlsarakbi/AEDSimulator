@@ -4,7 +4,7 @@ project(aed)
 set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_PREFIX_PATH "C:\\Qt\\6.6.1\\mingw_64\\bin")
+set(CMAKE_PREFIX_PATH "C:\\Qt\\6.6.1\\mingw_64")
 
 # adding GoogleTests
 add_subdirectory(tests)
@@ -38,6 +38,7 @@ target_link_libraries(patient heart pulse)
 add_executable(aed
     main.cpp
     mainwindow.cpp
+    img.qrc
     mainwindow.h
     mainwindow.ui
     model/aed/AED.h

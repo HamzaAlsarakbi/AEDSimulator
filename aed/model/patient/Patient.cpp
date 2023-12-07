@@ -29,6 +29,17 @@ bool Patient::shockable(){
     bool isCardiacArrest = (heart->getStatus() == VTACH || heart->getStatus() == VFIB);
     return (getHeartRate() > 120 && isCardiacArrest);
 }
+/**
+ * Simulates the administration of a shock
+ */
+void Patient::shock() {
+    if(!shockable()) return;
+    heart->shock();
+}
+
+bool Patient::cprAble() {
+    return getHeartRate() < 40;
+}
 
 bool Patient::cpr(double compressionDepth){
     if(compressionDepth >= minCompressionDepth && compressionDepth <= maxCompressionDepth){
@@ -69,7 +80,7 @@ void Patient::reset(PatientSCondition condition){
             heart->setStatus(random == 0 ? VTACH : VFIB);
             break;
         case PSC_HEART_ATTACK:
-            distribution = std::uniform_int_distribution<>(500, 250); // [120-240] BPM
+            distribution = std::uniform_int_distribution<>(250, 500); // [120-240] BPM
             heart->setBasePulseTime(distribution(gen));
             distribution = std::uniform_int_distribution<>(0, 60);
             random = distribution(gen);
@@ -78,7 +89,7 @@ void Patient::reset(PatientSCondition condition){
             heart->setStatus(random == 0 ? VTACH : VFIB);
             break;
         default:
-            distribution = std::uniform_int_distribution<>(1000, 500); // [120-240] BPM
+            distribution = std::uniform_int_distribution<>(500, 1000); // [120-240] BPM
             heart->setBasePulseTime(distribution(gen));
             heart->setPulseTimeVariance(0);
             heart->setVtach(false);
