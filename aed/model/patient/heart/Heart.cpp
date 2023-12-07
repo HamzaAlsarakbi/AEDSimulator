@@ -7,7 +7,7 @@
  */
 Heart::Heart()
     : threadActive(true), thread(&Heart::updateState, this), status(HEART_NORMAL),
-      basePulseTime(milliseconds(1000)), pulseTimeVariance(milliseconds(0)), heartRate(-1),
+      basePulseTime(milliseconds(1000)), pulseTimeVariance(milliseconds(0)), heartRate(0),
       distribution(std::uniform_int_distribution<>(0, INT32_MAX))
 {
     std::random_device rd;
@@ -66,31 +66,31 @@ long long Heart::generatePulseDuration() {;
 void Heart::updateState()
 {
     long long pulseDuration = 0; // override this value in the while loop, the default duration between pulses
-    const long long tickRate = 100; // milliseconds
+    const long long tickRate = 10; // milliseconds
 
     auto lastTick = high_resolution_clock::now();
     long long totalElapsedTime = 0;
     bool isRegular = false;
-    auto elapsedTimeSinceLastPulse = 0;
+    auto nextPulseTime = 0;
     while (threadActive)
     {
         const auto currentTick = high_resolution_clock::now();
         const auto elapsedTimeSinceLastTick = duration_cast<milliseconds>(currentTick - lastTick).count();
-        elapsedTimeSinceLastPulse += elapsedTimeSinceLastTick;
         totalElapsedTime += duration_cast<milliseconds>(currentTick - lastTick).count();
         lastTick = currentTick;
 
         // Check if it's time for the next pulse
         // compare elapsed time since last pulse to pulse duration
-        if (elapsedTimeSinceLastPulse >= pulseDuration)
+        if (totalElapsedTime >= nextPulseTime)
         {
-            elapsedTimeSinceLastPulse = 0;
+            // accommodate for thread error
+            totalElapsedTime = nextPulseTime;
             pulseDuration = generatePulseDuration();
+            nextPulseTime = pulseDuration + totalElapsedTime;
 
             // Add a new pulse
-            milliseconds timestamp = pulses.empty() ? milliseconds(0) : pulses.at(pulses.size()-1)->getTime() + milliseconds(pulseDuration);
-//            std::cout << "Creating new pulse at: " << std::chrono::duration_cast<std::chrono::milliseconds>(timestamp).count() << " ms" << std::endl;
-            pulses.push_back(new Pulse(timestamp, getStatus() == VTACH));
+            std::cout << "["<< totalElapsedTime << "ms] Created a pulse at: " << totalElapsedTime << "ms, next pulse in " << pulseDuration <<  "ms, at " << nextPulseTime << std::endl;
+            pulses.push_back(new Pulse(milliseconds(totalElapsedTime), getStatus() == VTACH));
 
             // Check regularity
             // -2 to exclude last duration comparison (accesses garbage)
@@ -105,9 +105,8 @@ void Heart::updateState()
                     minPt = diff < minPt ? diff : minPt;
                 }
                 isRegular = (maxPt - minPt) == 0;
-                if(!isRegular){
+//                if(!isRegular)
 //                    std::cout << "Pulse is not regular " << std::endl;
-                }
             }
             else{
                 if(this->getStatus() == VTACH || this->getStatus() == HEART_NORMAL){
@@ -123,18 +122,17 @@ void Heart::updateState()
             }
 
             // Calculate heartRate
-            if (isRegular)
-            {
+            if(pulses.empty()) {
+                heartRate = 0;
+            } else if (isRegular) {
+                if(status == VFIB) status = HEART_NORMAL;
                 // Use big-box method to calculate heart rate
                 if(pulses.size() >= 2){
-                    heartRate = 60000 / (pulses[1]->getTime() - pulses[0]->getTime()).count();
+                    heartRate = 60,000 / (pulses[1]->getTime() - pulses[0]->getTime()).count();
+                } else {
+                    heartRate = 0;
                 }
-                else {
-                    heartRate = -1;
-                }
-            }
-            else
-            {
+            } else {
                 status = VFIB; // commenting this out makes heartNormalStatusTest to pass but status wrong for heartVfibTest
                 // Use 6-second method to calculate heart rate
                 heartRate = pulses.size() * 10;
@@ -159,5 +157,5 @@ void Heart::clearPulses() {
         delete pulses.at(pulses.size() - 1);
         pulses.pop_back();
     }
-    heartRate = -1;
+    heartRate = 0;
 }

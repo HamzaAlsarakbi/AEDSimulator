@@ -14,8 +14,9 @@ public:
 private:
     // milliseconds
     const unsigned long stepDuration = 1000;
-    const unsigned long testDuration = 1000;
-    const unsigned long turnOnDuration = 1000;
+    const unsigned long testDuration = 10;
+    const unsigned long turnOnDuration = 10;
+    const unsigned long shockDuration = 3000;
 
 public slots:
     void waitTurnOn() {
@@ -62,9 +63,17 @@ public slots:
         QThread::msleep(stepDuration);
         emit readyPatientHealthy();
     }
-    void waitChangeBattery()    {
+    void waitChangeBattery() {
         QThread::msleep(stepDuration);
         emit readyChangeBattery();
+    }
+    void waitShock() {
+        QThread::msleep(shockDuration);
+        emit readyShock();
+    }
+    void waitUpdateHeartRate() {
+        QThread::msleep(100);
+        emit readyUpdateHeartRate();
     }
 
 signals:
@@ -80,6 +89,8 @@ signals:
     void readyStartCpr();
     void readyShockAdvised();
     void readyPatientHealthy();
+    void readyShock();
+    void readyUpdateHeartRate();
 };
 
 #endif

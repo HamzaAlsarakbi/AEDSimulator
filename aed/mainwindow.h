@@ -21,11 +21,8 @@ public slots:
     void baseDepthSliderHandler(int value);
     void baseDepthVarianceSliderHandler(int value);
     void ageSliderHandler(int value);
-    void qrsWidthSliderHandler(int value);
-    void qrsWidthVarianceSliderHandler(int value);
     
     void turnOnHandler();
-    void changeBatteriesHandler();
     void padsCorrectHandler();
     void padsIncorrectHandler();
     void administerShockHandler();
@@ -33,6 +30,7 @@ public slots:
     void failTestHandler();
     void update(AEDStatus status);
     void updateDisplay(std::string text);
+    void updateHeartRate();
 
 private:
     Ui::MainWindow *ui;

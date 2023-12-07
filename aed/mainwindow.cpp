@@ -27,13 +27,10 @@ void MainWindow::connectUI() {
     connect(ui->baseDepthSlider, &QSlider::valueChanged, this, &MainWindow::baseDepthSliderHandler);
     connect(ui->baseDepthVarianceSlider, &QSlider::valueChanged, this, &MainWindow::baseDepthVarianceSliderHandler);
     connect(ui->ageSlider, &QSlider::valueChanged, this, &MainWindow::ageSliderHandler);
-    connect(ui->qrsWidthSlider, &QSlider::valueChanged, this, &MainWindow::qrsWidthSliderHandler);
-    connect(ui->qrsWidthVarianceSlider, &QSlider::valueChanged, this, &MainWindow::qrsWidthVarianceSliderHandler);
 
     // Buttonss
     connect(ui->turnOnButton, &QPushButton::pressed, this, &MainWindow::turnOnHandler);
     connect(ui->turnOffButton, SIGNAL(pressed()), aedDevice, SLOT(handleTurnOff()));
-    connect(ui->changeBatteriesButton, &QPushButton::pressed, this, &MainWindow::changeBatteriesHandler);
     connect(ui->attachDefibPadsCorrectlyButton, &QPushButton::pressed, this, &MainWindow::padsCorrectHandler);
     connect(ui->attachDefibPadsIncorrectlyButton, &QPushButton::pressed, this, &MainWindow::padsIncorrectHandler);
     connect(ui->failTestButton, &QPushButton::pressed, this, &MainWindow::failTestHandler);
@@ -41,6 +38,7 @@ void MainWindow::connectUI() {
     connect(ui->cprButton, &QPushButton::pressed, this, &MainWindow::cprHandler);
     connect(aedDevice, SIGNAL(update(AEDStatus)), this, SLOT(update(AEDStatus)));
     connect(aedDevice, SIGNAL(updateDisplay(std::string)), this, SLOT(updateDisplay(std::string)));
+    connect(aedDevice, SIGNAL(initUpdateHeartRate()), this, SLOT(updateHeartRate()));
 }
 void MainWindow::update(AEDStatus status) {
     std::vector<QString> displayStrings = { "TURNING ON", "", "BATTERY DEAD", "CHANGE BATTERY", "TEST FAIL", "UNIT OK", "CHECK RESPONSIVENESS", "CALL HELP", "ATTACH PADS TO PATIENT'S CHEST", "DON'T TOUCH PATIENT, ANALYZING", "SHOCK ADVISED", "SHOCK NOT ADVISED", "START CPR", "PATIENT HEALTHY" };
@@ -72,14 +70,22 @@ void MainWindow::update(AEDStatus status) {
 
 //    Patient Controls
     ui->ageWidget->setVisible(aedDevice->getConnectionStatus() == GOOD);
+    ui->ageWidget->setDisabled(status > 9);
     ui->qrsWidthWidget->setVisible(aedDevice->getConnectionStatus() == GOOD);
     ui->qrsWidthVarianceWidget->setVisible(aedDevice->getConnectionStatus() == GOOD);
     ui->vtachWidget->setVisible(aedDevice->getConnectionStatus() == GOOD);
 }
 
 void MainWindow::updateDisplay(std::string text) {
-    std::cout << "sho habibi? " << text << std::endl;
     ui->displayLabel->setText(QString::fromStdString(text));
+}
+void MainWindow::updateHeartRate() {
+    ui->heartRateLabel->setText(aedDevice->getHeartRate() == -1 ? "" : QString::number(aedDevice->getHeartRate()));
+    ui->qrsWidthLabel->setText(QString::number(aedDevice->getBasePulseTime()));
+    ui->qrsWidthVarianceLabel->setText(QString::number(aedDevice->getPulseTimeVariance()));
+    ui->pulsesCountLabel->setText(QString::number(aedDevice->getPulsesCount()));
+    std::vector<std::string> statuses = { "NORMAL", "VTACH", "VFIB", "ARISTOTLE" };
+    ui->heartStatusLabel->setText(QString::fromStdString(statuses.at(aedDevice->getHeartStatus())));
 }
 
 void MainWindow::batterySliderHandler(int value) {
@@ -96,23 +102,11 @@ void MainWindow::baseDepthVarianceSliderHandler(int value) {
 }
 void MainWindow::ageSliderHandler(int value) {
     ui->ageLabel->setText(QString::number(value, 'd', 0));
-    std::cout << "todo MainWindow::ageSliderHandler(value: " << value << ")" << std::endl;
-}
-void MainWindow::qrsWidthSliderHandler(int value) {
-    ui->qrsWidthLabel->setText(QString::number(value, 'd', 0));
-    std::cout << "todo MainWindow::qrsWidthSliderHandler(value: " << value << ")" << std::endl;
-}
-void MainWindow::qrsWidthVarianceSliderHandler(int value) {
-    ui->qrsWidthVarianceLabel->setText(QString::number(value, 'd', 0));
-    std::cout << "todo MainWindow::qrsWidthVarianceSliderHandler(value: " << value << ")" << std::endl;
+    aedDevice->setAge(value);
 }
 
 void MainWindow::turnOnHandler(){
     emit aedDevice->initTurnOn();
-}
-
-void MainWindow::changeBatteriesHandler(){
-    std::cout << "todo MainWindow::changeBatteriesHandler()" << std::endl;
 }
 
 void MainWindow::padsCorrectHandler(){
@@ -124,7 +118,7 @@ void MainWindow::padsIncorrectHandler(){
 }
 
 void MainWindow::administerShockHandler(){
-    std::cout << "todo MainWindow::administerShockHandler()" << std::endl;
+    aedDevice->administerShock();
 }
 
 void MainWindow::cprHandler(){
@@ -135,7 +129,6 @@ void MainWindow::cprHandler(){
                 ((QRandomGenerator::global()->generate()%2)*2-1);
     int actualDepth = ui->baseDepthSlider->value() + variance;
     aedDevice->cpr(actualDepth);
-    std::cout << "todo get min and max depth values in MainWindow::cprHandler() from Patient values" << std::endl;
     int min = aedDevice->getMinCompressionDepth();
     int max = aedDevice->getMaxCompressionDepth();
     max -= min;

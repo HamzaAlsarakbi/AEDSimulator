@@ -7,6 +7,9 @@
 enum PatientSCondition {
     PSC_NORMAL, PSC_SUB40, PSC_ARISTOTLE, PSC_HEART_ATTACK,
 };
+enum CompressionResult {
+    COMP_GOOD, COMP_HARDER, COMP_SOFTER, COMP_SLOWER, COMP_FASTER
+};
 class Patient {
 public:
     Patient(PatientSCondition condition);
@@ -23,7 +26,7 @@ public:
     bool shockable();
     void shock();
     bool cprAble();
-    bool cpr(double); // returns true if compression was good, otherwise false
+    CompressionResult cpr(int); // returns true if compression was good, otherwise false
     void reset(PatientSCondition condition); // reset  heart status to normal. set pulseTimeVariance to 0 and set basePulseTime to 1000
     Heart* getHeart() {return heart;}
 

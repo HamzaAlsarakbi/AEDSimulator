@@ -42,13 +42,20 @@ public:
     ConnectionStatus getConnectionStatus() { return connection; }
     int getBattery() const { return battery; }
     int getShocksCount() const { return shocks; }
+    int getHeartRate() const { return patient->getHeartRate(); }
+    HeartStatus getHeartStatus() const { return patient->getHeart()->getStatus(); }
+    long long getBasePulseTime() const { return patient->getHeart()->getBasePulseTime(); }
+    long long getPulseTimeVariance() const { return patient->getHeart()->getPulseTimeVariance(); }
+    int getPulsesCount() const { return patient->getHeart()->getPulsesCount(); }
     bool isPassing() const { return !doesTestFail; }
     int getMinCompressionDepth() const { return patient->getMinCompressionDepth(); }
     int getMaxCompressionDepth() const { return patient->getMaxCompressionDepth(); }
     void setBattery(int battery) { this->battery = battery; }
     void setTestFail(bool state) { doesTestFail = state; }
     void setPadPlacement(ConnectionStatus status);
+    void setAge(int value) { patient->setAge(value); }
     void cpr(double depth);
+    void administerShock();
 
     // Test-related functions
     //void startSelfTest();
@@ -84,6 +91,8 @@ public slots:
     void handleStartCpr();
     void handleShockAdvised();
     void handlePatientHealthy();
+    void handleShock();
+    void handleUpdateHeartRate();
 
 signals:
     void initTurnOn();
@@ -99,8 +108,11 @@ signals:
     void initShockAdvised();
     void initShockNotAdvised();
     void initPatientHealthy();
+    void initUpdateHeartRate();
     void update(AEDStatus state);
     void updateDisplay(std::string text);
+
+    void initShock();
 
 };
 

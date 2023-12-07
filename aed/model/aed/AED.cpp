@@ -19,6 +19,8 @@ patient(new Patient(PSC_HEART_ATTACK))
     connect(this, &AED::initShockAdvised, worker, &AEDWorker::waitShockAdvised);
     connect(this, &AED::initPatientHealthy, worker, &AEDWorker::waitPatientHealthy);
     connect(this, &AED::initChangeBattery, worker, &AEDWorker::waitChangeBattery);
+    connect(this, &AED::initShock, worker, &AEDWorker::waitShock);
+    connect(this, &AED::initUpdateHeartRate, worker, &AEDWorker::waitUpdateHeartRate);
 
     connect(worker, &AEDWorker::readyTurnOn, this, &AED::handleTurnOn);
     connect(worker, &AEDWorker::readySelfTest, this, &AED::handleSelfTest);
@@ -32,6 +34,8 @@ patient(new Patient(PSC_HEART_ATTACK))
     connect(worker, &AEDWorker::readyStartCpr, this, &AED::handleStartCpr);
     connect(worker, &AEDWorker::readyShockAdvised, this, &AED::handleShockAdvised);
     connect(worker, &AEDWorker::readyPatientHealthy, this, &AED::handlePatientHealthy);
+    connect(worker, &AEDWorker::readyShock, this, &AED::handleShock);
+    connect(worker, &AEDWorker::readyUpdateHeartRate, this, &AED::handleUpdateHeartRate);
     workerThread.start();
 }
 
@@ -160,32 +164,56 @@ void AED::handleDontTouchPatient() {
 void AED::handleStartCpr() {
     if(status == AED_OFF) return;
     status = START_CPR;
+    emit initUpdateHeartRate();
     emit update(status);
 }
 void AED::handleShockAdvised() {
     if(status == AED_OFF) return;
     status = SHOCK_ADVISED;
+    emit initUpdateHeartRate();
     emit update(status);
 }
 void AED::handlePatientHealthy() {
     if(status == AED_OFF) return;
     status = AED_PATIENT_HEALTHY;
+    emit initUpdateHeartRate();
     emit update(status);
+    emit initPatientHealthy();
+}
+
+void AED::administerShock() {
+    updateDisplay("Administering shock in 3...2...1");
+    emit initShock();
 }
 
 
 void AED::cpr(double depth) {
     if(status == AED_OFF) return;
     battery--;
-    patient->cpr(depth);
-    std::cout << "todo pass depth to Patient class from AED::cpr(...)" << std::endl;
+    CompressionResult result = patient->cpr(depth);
+    std::vector<std::string> resultStr = { "GOOD COMPRESSION", "HARDER ;)", "SOFTER :(", "SLOWER :(", "FASTER ;)" };
+    emit updateDisplay(resultStr.at(result));
+    if(patient->shockable()) {
+        emit initShockAdvised();
+    } else if (!patient->cprAble()) {
+        emit initPatientHealthy();
+    }
+}
+void AED::handleUpdateHeartRate() {
+    if(status < 8) return;
+    emit initUpdateHeartRate();
 }
 /**
  * Administers a shock
  */
-void AED::shock() {
+void AED::handleShock() {
     if(status == AED_OFF) return;
+    if(battery < 10) {
+        emit updateDisplay("NOT ENOUGH BATTERY FOR SHOCK");
+        return;
+    }
     shocks++;
     battery -= 10;
-    std::cout << "todo pass shock() invokation to Patient class from AED::shock()" << std::endl;
+    patient->shock();
+    emit initStartCpr();
 }

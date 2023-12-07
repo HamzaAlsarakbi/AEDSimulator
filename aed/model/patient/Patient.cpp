@@ -1,5 +1,4 @@
 #include "Patient.h"
-
 /**
  * Constructs a Patient with a default age of 18 years old
  */
@@ -41,21 +40,20 @@ bool Patient::cprAble() {
     return getHeartRate() < 40;
 }
 
-bool Patient::cpr(double compressionDepth){
-    if(compressionDepth >= minCompressionDepth && compressionDepth <= maxCompressionDepth){
-        long long basePulseTime = 60000/getHeartRate();
-        long long pulseTimeApproachDistance = (abs(1000 - basePulseTime)) / 2;
-        long long ptvApproachDistance = (abs(heart->getPulseTimeVariance())) / 2;
+CompressionResult Patient::cpr(int compressionDepth){
+    if(compressionDepth < minCompressionDepth) return COMP_HARDER;
+    if(compressionDepth > maxCompressionDepth) return COMP_SOFTER;
+    long long basePulseTime = 60000/getHeartRate();
+    long long pulseTimeApproachDistance = fmin(abs(1000 - basePulseTime) / 2, 50);
+    long long ptvApproachDistance = fmin(abs(heart->getPulseTimeVariance()) / 2, 5);
 //        getHeartRate() < 60 ? basePulseTime += pulseTimeApproachDistance : basePulseTime -= pulseTimeApproachDistance;
-        basePulseTime += pulseTimeApproachDistance * (getHeartRate() > 60 ? 1 : -1);
-        heart->setBasePulseTime(basePulseTime);
+    basePulseTime += pulseTimeApproachDistance * (getHeartRate() > 60 ? 1 : -1);
+    heart->setBasePulseTime(basePulseTime);
 
-        if(heart->getPulseTimeVariance() > 0){
-            heart->setPulseTimeVariance(ptvApproachDistance);
-        }
-        return true;
+    if(heart->getPulseTimeVariance() > 0){
+        heart->setPulseTimeVariance(ptvApproachDistance);
     }
-    return false;
+    return COMP_GOOD;
 }
 
 void Patient::reset(PatientSCondition condition){
@@ -80,7 +78,7 @@ void Patient::reset(PatientSCondition condition){
             heart->setStatus(random == 0 ? VTACH : VFIB);
             break;
         case PSC_HEART_ATTACK:
-            distribution = std::uniform_int_distribution<>(250, 500); // [120-240] BPM
+            distribution = std::uniform_int_distribution<>(310, 500); // [120-240] BPM
             heart->setBasePulseTime(distribution(gen));
             distribution = std::uniform_int_distribution<>(0, 60);
             random = distribution(gen);
