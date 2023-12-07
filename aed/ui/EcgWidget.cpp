@@ -5,15 +5,14 @@
 #include <iostream>
 #include "EcgWidget.h"
 
-EcgWidget::EcgWidget(QWidget *parent): QWidget(parent), timestamps({}), heartRate(0) {
+EcgWidget::EcgWidget(QWidget *parent): QWidget(parent), pulses({}), heartRate(0) {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setMaximumWidth(1000);
     setMaximumHeight(1000);
 }
 
-void EcgWidget::draw(int heartRate) {
-//    this->timestamps = timestamps;
-    this->heartRate = heartRate;
+void EcgWidget::draw(std::vector<Pulse> pulses) {
+    this->pulses = pulses;
     repaint();
 }
 
@@ -41,30 +40,17 @@ void EcgWidget::paintEvent(QPaintEvent *event) {
         painter.drawLine(0, y, width(), y);
     }
 
-//    draw generic sine wave (temp, implement full thing if we got time)
-    painter.setPen(Qt::black);
-    QPointF prevPoint;
-    int frequency = heartRate / 10;
-    for (int x = -width(); x < width(); ++x)
-    {
-        double y = amplitude * std::sin(2.0 * frequency * M_PI * x / width());
-        QPointF curPoint(x, -y);
-        if (x > -width())
-            painter.drawLine(prevPoint, curPoint);
-        prevPoint = curPoint;
-    }
-
     std::vector<int> xPositions = {};
-    int interval = timestamps.empty() ? 0 : width() / timestamps.size();
-    for(int i = 0; i < timestamps.size(); i++) {
+    int interval = pulses.empty() ? 0 : width() / pulses.size();
+    for(int i = 0; i < pulses.size(); i++) {
         xPositions.push_back(interval/2 + interval*i);
     }
 
     // center-point of each pulse
-//    painter.setPen(Qt::red);
-//    for (int xPos : xPositions) {
-//        painter.drawLine(xPos, -height(), xPos, height());
-//    }
+   painter.setPen(Qt::red);
+   for (int xPos : xPositions) {
+       painter.drawLine(xPos, -height(), xPos, height());
+   }
 
 
 //    QPointF prevPoint;

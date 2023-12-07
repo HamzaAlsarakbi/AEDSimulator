@@ -39,6 +39,13 @@ void Heart::setVtach(bool vtach)
     }
 }
 
+PulseType Heart::getCurrentPulseType() {
+    return status == HEART_NORMAL ? PULSE_NORMAL :
+    status == VTACH ? PULSE_VTACH :
+    status == VFIB ? PULSE_VFIB : 
+    PULSE_ASYSTOLE;
+}
+
 /**
  *  Administers shock
  */
@@ -93,7 +100,7 @@ void Heart::updateState()
 
             // Add a new pulse
             std::cout << "["<< totalElapsedTime << "ms] Created a pulse at: " << totalElapsedTime << "ms, next pulse in " << pulseDuration <<  "ms, at " << nextPulseTime << std::endl;
-            pulses.push_back(new Pulse(milliseconds(totalElapsedTime), getStatus() == VTACH));
+            pulses.push_back(new Pulse(milliseconds(totalElapsedTime), getCurrentPulseType()));
 
             // Check regularity
             // -2 to exclude last duration comparison (accesses garbage)
