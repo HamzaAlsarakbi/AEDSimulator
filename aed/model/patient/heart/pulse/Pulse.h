@@ -6,14 +6,14 @@
 using namespace std::chrono;
 class Pulse {
 public:
-    Pulse(bool vtach);
+    Pulse(milliseconds timestamp, bool vtach);
 
     // getters
-    nanoseconds getTime() const { return timestamp; }
+    milliseconds getTime() const { return timestamp; }
     bool isVtach() const { return vtach; }
     // don't put setters here, no need
 private:
-    nanoseconds timestamp;
+    milliseconds timestamp;
     bool vtach;
 };
 
