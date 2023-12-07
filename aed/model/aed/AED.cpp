@@ -2,7 +2,7 @@
 
 AED::AED()
 : battery(100), status(AED_OFF), connection(NONE), shocks(0),
-patient(new Patient(PSC_SUB40))
+patient(new Patient(PSC_NORMAL))
 {
     AEDWorker* worker = new AEDWorker;
     worker->moveToThread(&workerThread);
@@ -192,7 +192,6 @@ void AED::administerShock() {
 
 void AED::cpr(double depth) {
     if(status < 6) return;
-    addLoadOnBattery(1);
     emit update(status);
     CompressionResult result = patient->cpr(depth);
     std::vector<std::string> resultStr = { "GOOD COMPRESSION", "HARDER ;)", "SOFTER :(", "SLOWER :(", "FASTER ;)" };
@@ -225,4 +224,10 @@ void AED::handleShock() {
 void AED::addLoadOnBattery(int load) {
     battery -= load;
     if(battery <= 0) handleChangeBattery();
+}
+/**
+ * Resets the patient's starting condition
+*/
+void AED::resetPatient(PatientSCondition condition) {
+    patient->reset(condition);
 }

@@ -30,6 +30,7 @@ void MainWindow::connectUI() {
     connect(ui->baseDepthSlider, &QSlider::valueChanged, this, &MainWindow::baseDepthSliderHandler);
     connect(ui->baseDepthVarianceSlider, &QSlider::valueChanged, this, &MainWindow::baseDepthVarianceSliderHandler);
     connect(ui->ageSlider, &QSlider::valueChanged, this, &MainWindow::ageSliderHandler);
+    connect(ui->startingConditionBox, SIGNAL(currentTextChanged(QString)), this, SLOT(patientStartingConditionHandler(QString)));
 //    connect(this, SIGNAL(drawEcg(std::vector<long long>)), ecgWidget, SLOT(draw(std::vector<long long>)));
     connect(this, SIGNAL(drawEcg(int)), ecgWidget, SLOT(draw(int)));
 
@@ -40,6 +41,7 @@ void MainWindow::connectUI() {
     connect(ui->attachDefibPadsIncorrectlyButton, &QPushButton::pressed, this, &MainWindow::padsIncorrectHandler);
     connect(ui->failTestButton, &QPushButton::pressed, this, &MainWindow::failTestHandler);
     connect(ui->administerShockButton, &QPushButton::pressed, this, &MainWindow::administerShockHandler);
+    connect(ui->cprButton, &QPushButton::pressed, this, &MainWindow::cprHandler);
     connect(ui->cprButton, &QPushButton::pressed, this, &MainWindow::cprHandler);
     connect(aedDevice, SIGNAL(update(AEDStatus)), this, SLOT(update(AEDStatus)));
     connect(aedDevice, SIGNAL(updateDisplay(std::string)), this, SLOT(updateDisplay(std::string)));
@@ -78,8 +80,8 @@ void MainWindow::update(AEDStatus status) {
     ui->cprButton->setDisabled(status != START_CPR);
 
 //    Patient Controls
-    ui->ageWidget->setVisible(aedDevice->getConnectionStatus() == GOOD);
     ui->ageWidget->setDisabled(status > 8);
+    ui->startingConditionWidget->setDisabled(status > 1);
     ui->qrsWidthWidget->setVisible(status > 8);
     ui->qrsWidthVarianceWidget->setVisible(status > 8);
     ui->vtachWidget->setVisible(status > 8);
@@ -91,6 +93,7 @@ void MainWindow::updateDisplay(std::string text) {
     ui->displayLabel->setText(QString::fromStdString(text));
 }
 void MainWindow::updateHeartRate() {
+    if(aedDevice->isHeartNull()) return;
     ui->heartRateLabel->setText(aedDevice->getHeartRate() == -1 ? "" : QString::number(aedDevice->getHeartRate()));
     ui->qrsWidthLabel->setText(QString::number(aedDevice->getBasePulseTime()));
     ui->qrsWidthVarianceLabel->setText(QString::number(aedDevice->getPulseTimeVariance()));
@@ -115,6 +118,15 @@ void MainWindow::baseDepthVarianceSliderHandler(int value) {
 void MainWindow::ageSliderHandler(int value) {
     ui->ageLabel->setText(QString::number(value, 'd', 0));
     aedDevice->setAge(value);
+}
+
+void MainWindow::patientStartingConditionHandler(QString condition) {
+    std::string c = condition.toStdString();
+    aedDevice->resetPatient(
+        c == "Normal" ? PSC_NORMAL :
+        c == "Aristotle" ? PSC_ARISTOTLE :
+        c == "Sub 40" ? PSC_SUB40 :
+        PSC_HEART_ATTACK);
 }
 
 void MainWindow::turnOnHandler(){

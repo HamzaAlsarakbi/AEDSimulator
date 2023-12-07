@@ -43,6 +43,7 @@ public:
     ConnectionStatus getConnectionStatus() { return connection; }
     int getBattery() const { return battery; }
     int getShocksCount() const { return shocks; }
+    bool isHeartNull() const { return patient->getHeart() == nullptr; }
     int getHeartRate() const { return patient->getHeartRate(); }
     HeartStatus getHeartStatus() const { return patient->getHeart()->getStatus(); }
     long long getBasePulseTime() const { return patient->getHeart()->getBasePulseTime(); }
@@ -57,6 +58,7 @@ public:
     void setAge(int value) { patient->setAge(value); }
     void cpr(double depth);
     void administerShock();
+    void resetPatient(PatientSCondition condition);
 
 private:
     QThread thread;

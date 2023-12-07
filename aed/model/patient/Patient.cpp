@@ -72,6 +72,11 @@ CompressionResult Patient::cpr(int compressionDepth){
 void Patient::reset(PatientSCondition condition){
     std::uniform_int_distribution<> distribution;
     int random;
+    // safely transfer ownership before deletion to avoid segfaults
+    Heart* temp = heart;
+    heart = nullptr;
+    delete temp;
+    heart = new Heart();
     switch(condition) {
         case PSC_ARISTOTLE:
             heart->setBasePulseTime(60005); // .6 BPM

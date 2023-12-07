@@ -22,6 +22,7 @@ public slots:
     void baseDepthSliderHandler(int value);
     void baseDepthVarianceSliderHandler(int value);
     void ageSliderHandler(int value);
+    void patientStartingConditionHandler(QString condition);
     
     void turnOnHandler();
     void padsCorrectHandler();
