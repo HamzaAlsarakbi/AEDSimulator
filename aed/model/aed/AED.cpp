@@ -1,5 +1,9 @@
 #include "AED.h"
 
+/**
+ * @brief Construct a new AED::AED object
+ * 
+ */
 AED::AED()
 : battery(100), status(AED_OFF), connection(NONE), shocks(0),
 patient(new Patient(PSC_NORMAL))
@@ -40,18 +44,31 @@ patient(new Patient(PSC_NORMAL))
     emit initUpdateHeartRate();
 }
 
+/**
+ * @brief Destroy the AED::AED object
+ * 
+ */
 AED::~AED(){
     workerThread.quit();
     workerThread.wait();
     delete patient;
 }
 
+/**
+ * @brief User attaches pad to the patient 
+ * 
+ * @param connection (ConnectionStatus) The quality of the connection to the patient
+ */
 void AED::setPadPlacement(ConnectionStatus connection) {
     if(status == AED_OFF) return;
     this->connection = connection;
     emit handleAttachPads();
 }
 
+/**
+ * @brief Turns on, then calls for self test
+ * 
+ */
 void AED::handleTurnOn() {
     if(battery <= 0) return;
     status = AED_ON;
@@ -59,6 +76,11 @@ void AED::handleTurnOn() {
     emit update(status);
     emit initSelfTest();
 }
+
+/**
+ * @brief Operates self test, then calls to check responsiveness of patient
+ * 
+ */
 void AED::handleSelfTest() {
     if(status < 2) return;
     addLoadOnBattery(2);
@@ -70,6 +92,11 @@ void AED::handleSelfTest() {
     }
     emit update(status);
 }
+
+/**
+ * @brief Checks for the battery. replays until battery is not 0
+ * 
+ */
 void AED::handleChangeBattery() {
     if (battery <= 0) {
         status = CHANGE_BATTERY;
@@ -79,23 +106,44 @@ void AED::handleChangeBattery() {
     }
     emit update(status);
 }
+
+/**
+ * @brief Turns off device
+ * 
+ */
 void AED::handleTurnOff() {
     status = AED_OFF;
     connection = NONE;
+    shocks = 0;
     emit update(status);
 }
+
+/**
+ * @brief Asks the user to check responsiveness of the patient
+ * 
+ */
 void AED::handleCheckResponsiveness() {
     if(status < 2) return;
     status = CHECK_RESPONSIVENESS;
     emit update(status);
     emit initCallHelp();
 }
+
+/**
+ * @brief Asks the user to call for help
+ * 
+ */
 void AED::handleCallHelp() {
     if(status < 2) return;
     status = CALL_HELP;
     emit update(status);
     emit initAttachPads();
 }
+
+/**
+ * @brief Checks the quality of connection. if good quality, move on
+ * 
+ */
 void AED::handleAttachPads() {
     if(status < 2) return;
     addLoadOnBattery(1);
@@ -109,21 +157,36 @@ void AED::handleAttachPads() {
         emit initAttachPads();
     }
 }
+
+/**
+ * @brief Checks the connection of teh pads onto the patient
+ * 
+ */
 void AED::handleCheckConnection() {
     if(status < 2) return;
     addLoadOnBattery(1);
     if (connection != GOOD) {
-        emit updateDisplay("CHECK CONNECTION HABIBI");
+        emit updateDisplay("CHECK CONNECTION");
         emit initCheckConnection();
     } else {
         emit initTypeOfPads();
     }
 }
+
+/**
+ * @brief Displays the type of pad connected
+ * 
+ */
 void AED::handleTypeOfPads() {
     if(status < 2) return;
     emit updateDisplay(patient->getAge() < 8 ? "CHILD PADZ" : "ADULT PADZ");
     emit initDontTouchPatient();
 }
+
+/**
+ * @brief Asks user not to shock patient while analyzing
+ * 
+ */
 void AED::handleDontTouchPatient() {
     if(status < 7) return;
     addLoadOnBattery(4);
@@ -142,6 +205,11 @@ void AED::handleDontTouchPatient() {
     }
     emit initPatientHealthy();
 }
+
+/**
+ * @brief Asks the user to start CPR
+ * 
+ */
 void AED::handleStartCpr() {
     if(status <= 7) return;
     if(status != START_CPR) {
@@ -156,6 +224,11 @@ void AED::handleStartCpr() {
         emit initStartCpr();
     }
 }
+
+/**
+ * @brief Advises the user to use the defibrillator on the patient
+ * 
+ */
 void AED::handleShockAdvised() {
     if(status < 7) return;
     if(status != SHOCK_ADVISED) {
@@ -170,6 +243,11 @@ void AED::handleShockAdvised() {
         emit initPatientHealthy();
     }
 }
+
+/**
+ * @brief Alerts user of the patient's health and stop operation
+ * 
+ */
 void AED::handlePatientHealthy() {
     if(status < 7) return;
     status = AED_PATIENT_HEALTHY;
@@ -183,13 +261,21 @@ void AED::handlePatientHealthy() {
     }
 }
 
+/**
+ * @brief Gives warning for shock
+ * 
+ */
 void AED::administerShock() {
     if(status != SHOCK_ADVISED) return;
     updateDisplay("Administering shock in 3...2...1");
     emit initShock();
 }
 
-
+/**
+ * @brief User does one complete push to the chest
+ * 
+ * @param depth (double) The compression depth the user applies
+ */
 void AED::cpr(double depth) {
     if(status < 6) return;
     emit update(status);
@@ -202,11 +288,18 @@ void AED::cpr(double depth) {
         emit initPatientHealthy();
     }
 }
+
+/**
+ * @brief Changes the display of the ECG
+ * 
+ */
 void AED::handleUpdateHeartRate() {
     emit initUpdateHeartRate();
 }
+
 /**
- * Administers a shock
+ * @brief Administers a shock
+ * 
  */
 void AED::handleShock() {
     if(status < 6) return;
@@ -221,13 +314,21 @@ void AED::handleShock() {
     emit initStartCpr();
 }
 
+/**
+ * @brief Depletes the battery by some variable amount
+ * 
+ * @param load (int) the amount of charge the battery is depleted
+ */
 void AED::addLoadOnBattery(int load) {
     battery -= load;
     if(battery <= 0) handleChangeBattery();
 }
+
 /**
- * Resets the patient's starting condition
-*/
+ * @brief Resets the patient's starting condition
+ * 
+ * @param condition (PatientSCondition) The heartrate of the patient
+ */
 void AED::resetPatient(PatientSCondition condition) {
     patient->reset(condition);
 }
