@@ -46,7 +46,7 @@ void MainWindow::connectUI() {
     connect(aedDevice, SIGNAL(initUpdateHeartRate()), this, SLOT(updateHeartRate()));
 }
 void MainWindow::update(AEDStatus status) {
-    std::vector<QString> displayStrings = { "TURNING ON", "", "BATTERY DEAD", "CHANGE BATTERY", "TEST FAIL", "UNIT OK", "CHECK RESPONSIVENESS", "CALL HELP", "ATTACH PADS TO PATIENT'S CHEST", "DON'T TOUCH PATIENT, ANALYZING", "SHOCK ADVISED", "SHOCK NOT ADVISED", "START CPR", "PATIENT HEALTHY" };
+    std::vector<QString> displayStrings = { "TURNING ON", "", "CHANGE BATTERY", "TEST FAIL", "UNIT OK", "CHECK RESPONSIVENESS", "CALL HELP", "ATTACH PADS TO PATIENT'S CHEST", "DON'T TOUCH PATIENT, ANALYZING", "SHOCK ADVISED", "SHOCK NOT ADVISED", "START CPR", "PATIENT HEALTHY" };
     std::vector<QFrame*> indicators = { ui->indicator1, ui->indicator2, ui->indicator3, ui->indicator4, ui->indicator5 };
     ui->displayLabel->setText(displayStrings.at(status));
 
@@ -55,12 +55,14 @@ void MainWindow::update(AEDStatus status) {
     ui->turnOffButton->setDisabled(status == AED_OFF);
     ui->failTestButton->setDisabled(status != AED_ON && status != AED_OFF);
 //    AED Screen
+    ui->heartRateLabel->setVisible(status > 8);
     ui->batteryLabel->setText(status == AED_OFF ? "" : QString::fromStdString(std::to_string(aedDevice->getBattery()) + "%"));
     ui->shocksCount->setText(status == AED_OFF ? "" : QString::number(aedDevice->getShocksCount()));
+    ecgWidget->setVisible(status > 8);
 //    AED Lights
     ui->testPassIndicator->setStyleSheet(status == AED_OFF || status == AED_ON ? "background-color: gray" : aedDevice->isPassing() ? "background-color: green" : "background-color: red");
     for(int i = 0; i < indicators.size(); i++) {
-        indicators.at(i)->setStyleSheet(i == (status-6) ? "background-color: green" : "background-color: gray");
+        indicators.at(i)->setStyleSheet(i == (status-5) ? "background-color: green" : "background-color: gray");
     }
     ui->padsConnectedIndicator->setStyleSheet(aedDevice->getConnectionStatus() == GOOD ? "background-color: green" :
     aedDevice->getConnectionStatus() == BAD ? "background-color: red" : "background-color: gray");
@@ -70,17 +72,19 @@ void MainWindow::update(AEDStatus status) {
     ui->changeBatteriesButton->setVisible(false);
     ui->attachDefibPadsCorrectlyButton->setVisible(status == ATTACH_PADS && aedDevice->getConnectionStatus() != GOOD);
     ui->attachDefibPadsIncorrectlyButton->setVisible(status == ATTACH_PADS && aedDevice->getConnectionStatus() == NONE);
-    ui->administerShockButton->setVisible(status > 9);
+    ui->administerShockButton->setVisible(status > 8);
     ui->administerShockButton->setDisabled(status != SHOCK_ADVISED);
-    ui->cprButton->setVisible(status > 9);
+    ui->cprButton->setVisible(status > 8);
     ui->cprButton->setDisabled(status != START_CPR);
 
 //    Patient Controls
     ui->ageWidget->setVisible(aedDevice->getConnectionStatus() == GOOD);
-    ui->ageWidget->setDisabled(status > 9);
-    ui->qrsWidthWidget->setVisible(aedDevice->getConnectionStatus() == GOOD);
-    ui->qrsWidthVarianceWidget->setVisible(aedDevice->getConnectionStatus() == GOOD);
-    ui->vtachWidget->setVisible(aedDevice->getConnectionStatus() == GOOD);
+    ui->ageWidget->setDisabled(status > 8);
+    ui->qrsWidthWidget->setVisible(status > 8);
+    ui->qrsWidthVarianceWidget->setVisible(status > 8);
+    ui->vtachWidget->setVisible(status > 8);
+    ui->pulsesInLastSecondsWidget->setVisible(status > 8);
+    ui->heartStatusWidget->setVisible(status > 8);
 }
 
 void MainWindow::updateDisplay(std::string text) {

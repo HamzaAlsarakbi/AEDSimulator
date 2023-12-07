@@ -37,19 +37,13 @@ patient(new Patient(PSC_HEART_ATTACK))
     connect(worker, &AEDWorker::readyShock, this, &AED::handleShock);
     connect(worker, &AEDWorker::readyUpdateHeartRate, this, &AED::handleUpdateHeartRate);
     workerThread.start();
+    emit initUpdateHeartRate();
 }
 
 AED::~AED(){
     workerThread.quit();
     workerThread.wait();
     delete patient;
-}
-
-void AED::resetBattery() {
-    setBattery(100);
-    if(status != AED_BATTERY_DEAD) return;
-    if(status == AED_OFF) return;
-    emit initSelfTest();
 }
 
 void AED::setPadPlacement(ConnectionStatus connection) {
@@ -59,6 +53,7 @@ void AED::setPadPlacement(ConnectionStatus connection) {
 }
 
 void AED::handleTurnOn() {
+    if(status == CHANGE_BATTERY) return;
     status = AED_ON;
     connection = NONE;
     emit update(status);
@@ -112,7 +107,7 @@ void AED::handleCallHelp() {
 }
 void AED::handleAttachPads() {
     if(status == AED_OFF) return;
-    battery--;
+    addLoadOnBattery(1);
     status = ATTACH_PADS;
     emit update(status);
     if (battery == 0) {
@@ -128,8 +123,8 @@ void AED::handleAttachPads() {
     }
 }
 void AED::handleCheckConnection() {
-    if(status == AED_OFF) return;
-    battery--;
+    if(status == AED_OFF || status == CHANGE_BATTERY) return;
+    addLoadOnBattery(1);
     if (connection != GOOD) {
         emit updateDisplay("CHECK CONNECTION HABIBI");
         emit initCheckConnection();
@@ -144,8 +139,8 @@ void AED::handleTypeOfPads() {
     emit initDontTouchPatient();
 }
 void AED::handleDontTouchPatient() {
-    if(status == AED_OFF) return;
-    battery -= 4;
+    if(status < 7) return;
+    addLoadOnBattery(4);
     status = DONT_TOUCH_PATIENT;
     emit update(status);
     // keep checking until you have a proper heart rate
@@ -162,21 +157,38 @@ void AED::handleDontTouchPatient() {
     emit initPatientHealthy();
 }
 void AED::handleStartCpr() {
-    if(status == AED_OFF) return;
-    status = START_CPR;
-    emit initUpdateHeartRate();
-    emit update(status);
+    if(status <= 7) return;
+    if(status != START_CPR) {
+        status = START_CPR;
+        emit update(status);
+    }
+    if(patient->shockable()) {
+        emit initShockAdvised();
+        return;
+    } else if (!patient->cprAble()) {
+        emit initPatientHealthy();
+        return;
+    }
+    emit initStartCpr();
 }
 void AED::handleShockAdvised() {
     if(status == AED_OFF) return;
-    status = SHOCK_ADVISED;
-    emit initUpdateHeartRate();
-    emit update(status);
+    if(status != SHOCK_ADVISED) {
+        status = SHOCK_ADVISED;
+        emit update(status);
+    }
+    if(patient->shockable()) {
+        emit initShockAdvised();
+        return;
+    } else if (patient->cprAble()) {
+        emit initStartCpr();
+        return;
+    }
+    emit initPatientHealthy();
 }
 void AED::handlePatientHealthy() {
     if(status == AED_OFF) return;
     status = AED_PATIENT_HEALTHY;
-    emit initUpdateHeartRate();
     emit update(status);
     if(patient->shockable()) {
         emit initShockAdvised();
@@ -196,7 +208,7 @@ void AED::administerShock() {
 
 void AED::cpr(double depth) {
     if(status == AED_OFF) return;
-    battery--;
+    addLoadOnBattery(1);
     CompressionResult result = patient->cpr(depth);
     std::vector<std::string> resultStr = { "GOOD COMPRESSION", "HARDER ;)", "SOFTER :(", "SLOWER :(", "FASTER ;)" };
     emit updateDisplay(resultStr.at(result));
@@ -209,7 +221,6 @@ void AED::cpr(double depth) {
     }
 }
 void AED::handleUpdateHeartRate() {
-    if(status < 8) return;
     emit initUpdateHeartRate();
 }
 /**
@@ -217,12 +228,17 @@ void AED::handleUpdateHeartRate() {
  */
 void AED::handleShock() {
     if(status == AED_OFF) return;
-    if(battery < 10) {
+    if(battery <= 10) {
         emit updateDisplay("NOT ENOUGH BATTERY FOR SHOCK");
         return;
     }
+    addLoadOnBattery(10);
     shocks++;
-    battery -= 10;
     patient->shock();
     emit initStartCpr();
+}
+
+void AED::addLoadOnBattery(int load) {
+    battery -= load;
+    if(battery <= 0) handleChangeBattery();
 }

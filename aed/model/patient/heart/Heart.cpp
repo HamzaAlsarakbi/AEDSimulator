@@ -7,7 +7,7 @@
  */
 Heart::Heart()
     : threadActive(true), thread(&Heart::updateState, this), status(HEART_NORMAL),
-      basePulseTime(milliseconds(1000)), pulseTimeVariance(milliseconds(0)), heartRate(0),
+      basePulseTime(milliseconds(1000)), pulseTimeVariance(milliseconds(0)), heartRate(-1),
       distribution(std::uniform_int_distribution<>(0, INT32_MAX))
 {
     std::random_device rd;

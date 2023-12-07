@@ -25,7 +25,7 @@ void Patient::setAge(int age) {
 }
 
 bool Patient::shockable(){
-    bool isCardiacArrest = (heart->getStatus() == VTACH || heart->getStatus() == VFIB);
+    bool isCardiacArrest = (heart->getStatus() == VTACH || heart->getPulseTimeVariance() > 0);
     return (getHeartRate() > 120 && isCardiacArrest);
 }
 /**

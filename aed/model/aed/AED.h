@@ -11,20 +11,21 @@
 using namespace std;
 
 enum AEDStatus {
-    AED_ON,
-    AED_OFF,
-    AED_BATTERY_DEAD,
-    CHANGE_BATTERY,
-    AED_TEST_FAIL,
-    UNIT_OK,
-    CHECK_RESPONSIVENESS,
-    CALL_HELP,
-    ATTACH_PADS,
-    DONT_TOUCH_PATIENT,
-    SHOCK_ADVISED,
-    SHOCK_NOT_ADVISED,
-    START_CPR,
-    AED_PATIENT_HEALTHY
+    AED_ON,                 // 0
+    AED_OFF,                // 1
+    CHANGE_BATTERY,         // 2
+    AED_TEST_FAIL,          // 3
+    UNIT_OK,                // 4
+
+    CHECK_RESPONSIVENESS,   // 5
+    CALL_HELP,              // 6
+    ATTACH_PADS,            // 7
+    DONT_TOUCH_PATIENT,     // 8
+
+    SHOCK_ADVISED,          // 9
+    SHOCK_NOT_ADVISED,      // 10
+    START_CPR,              // 11
+    AED_PATIENT_HEALTHY     // 12
 };
 
 enum ConnectionStatus {
@@ -57,15 +58,6 @@ public:
     void cpr(double depth);
     void administerShock();
 
-    // Test-related functions
-    //void startSelfTest();
-    void changeBatteries();
-
-    // AED steps
-    void turnOff();
-    void resetBattery();
-    void shock();
-
 private:
     QThread thread;
     bool threadActive;
@@ -76,6 +68,7 @@ private:
     Patient* patient;
     ConnectionStatus connection;
     double lastCompressionDepth;
+    void addLoadOnBattery(int load);
 
 public slots:
     void handleTurnOn();
