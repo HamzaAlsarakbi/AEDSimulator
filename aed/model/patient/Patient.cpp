@@ -1,7 +1,10 @@
 #include <iostream>
 #include "Patient.h"
+
 /**
- * Constructs a Patient with a default age of 18 years old
+ * @brief Constructs a Patient with a default age of 18 years old
+ * 
+ * @param condition (PatientSCondition) the starting condition of the patient
  */
 Patient::Patient(PatientSCondition condition)
 : heart(new Heart()), prevCompression(-1)
@@ -11,6 +14,11 @@ Patient::Patient(PatientSCondition condition)
     gen = std::default_random_engine(rd());
     reset(condition);
 }
+
+/**
+ * @brief Destroy the Patient:: Patient object
+ * 
+ */
 Patient::~Patient() {
     delete heart;
 }
