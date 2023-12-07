@@ -48,8 +48,11 @@ void MainWindow::connectUI() {
     connect(aedDevice, SIGNAL(initUpdateHeartRate()), this, SLOT(updateHeartRate()));
 }
 void MainWindow::update(AEDStatus status) {
+    const QString RED = QString::fromStdString("background-color: rgb(255, 100, 100)");
+    const QString GREEN = QString::fromStdString("background-color: rgb(100, 255, 100)");
+    const QString GRAY = QString::fromStdString("background-color: rgb(175, 175, 175)");
     std::vector<QString> displayStrings = { "", "CHANGE BATTERY", "TURNING ON", "TEST FAIL", "UNIT OK", "CHECK RESPONSIVENESS", "CALL HELP", "ATTACH PADS TO PATIENT'S CHEST", "DON'T TOUCH PATIENT, ANALYZING", "SHOCK ADVISED", "SHOCK NOT ADVISED", "START CPR", "PATIENT HEALTHY" };
-    std::vector<QFrame*> indicators = { ui->indicator1, ui->indicator2, ui->indicator3, ui->indicator4, ui->indicator5 };
+    std::vector<QFrame*> indicators = { ui->indicator1, ui->indicator2, ui->indicator3, ui->indicator4, ui->indicator5, ui->indicator6 };
     ui->displayLabel->setText(displayStrings.at(status));
 
 //    AED Controls
@@ -62,12 +65,12 @@ void MainWindow::update(AEDStatus status) {
     ui->shocksCount->setText(status < 2 ? "" : QString::number(aedDevice->getShocksCount()));
     ecgWidget->setVisible(status > 8);
 //    AED Lights
-    ui->testPassIndicator->setStyleSheet(status == AED_OFF || status == AED_ON ? "background-color: gray" : aedDevice->isPassing() ? "background-color: green" : "background-color: red");
+    ui->testPassIndicator->setStyleSheet(status == AED_OFF || status == AED_ON ? GRAY : aedDevice->isPassing() ? GREEN : RED);
     for(int i = 0; i < indicators.size(); i++) {
-        indicators.at(i)->setStyleSheet(i == (status-5) ? "background-color: green" : "background-color: gray");
+        indicators.at(i)->setStyleSheet(i == (status-5) ? GREEN : GRAY);
     }
-    ui->padsConnectedIndicator->setStyleSheet(aedDevice->getConnectionStatus() == GOOD ? "background-color: green" :
-    aedDevice->getConnectionStatus() == BAD ? "background-color: red" : "background-color: gray");
+    ui->padsConnectedIndicator->setStyleSheet(aedDevice->getConnectionStatus() == GOOD ? GREEN :
+    aedDevice->getConnectionStatus() == BAD ? RED : GRAY);
 
 //    Rescuer Controls
     ui->batterySlider->setValue(aedDevice->getBattery());

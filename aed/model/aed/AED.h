@@ -23,8 +23,8 @@ enum AEDStatus {
     DONT_TOUCH_PATIENT,     // 8
 
     SHOCK_ADVISED,          // 9
-    SHOCK_NOT_ADVISED,      // 10
-    START_CPR,              // 11
+    START_CPR,              // 10
+    SHOCK_NOT_ADVISED,      // 11
     AED_PATIENT_HEALTHY     // 12
 };
 
