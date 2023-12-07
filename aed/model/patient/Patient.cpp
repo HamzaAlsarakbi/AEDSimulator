@@ -1,9 +1,10 @@
+#include <iostream>
 #include "Patient.h"
 /**
  * Constructs a Patient with a default age of 18 years old
  */
 Patient::Patient(PatientSCondition condition)
-: heart(new Heart())
+: heart(new Heart()), prevCompression(-1)
 {
     setAge(18);
     std::random_device rd;
@@ -43,10 +44,22 @@ bool Patient::cprAble() {
 CompressionResult Patient::cpr(int compressionDepth){
     if(compressionDepth < minCompressionDepth) return COMP_HARDER;
     if(compressionDepth > maxCompressionDepth) return COMP_SOFTER;
+    auto curTime = system_clock::now();
+    milliseconds timestamp = duration_cast<milliseconds>(curTime.time_since_epoch());
+    long long duration = (timestamp - prevCompression).count();
+    if(prevCompression.count() > 0) {
+        prevCompression = timestamp;
+        if(duration > 600) {
+            return COMP_FASTER;
+        } else if(duration < 500) {
+            return COMP_SLOWER;
+        }
+    }
+    prevCompression = timestamp;
+
     long long basePulseTime = 60000/getHeartRate();
     long long pulseTimeApproachDistance = fmin(abs(1100 - basePulseTime) / 2, 50);
     long long ptvApproachDistance = fmin(abs(heart->getPulseTimeVariance()) / 2, 5);
-//        getHeartRate() < 60 ? basePulseTime += pulseTimeApproachDistance : basePulseTime -= pulseTimeApproachDistance;
     basePulseTime += pulseTimeApproachDistance * (getHeartRate() > 60 ? 1 : -1);
     heart->setBasePulseTime(basePulseTime);
 

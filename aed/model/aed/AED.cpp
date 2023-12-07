@@ -1,7 +1,7 @@
 #include "AED.h"
 
 AED::AED()
-: battery(100), status(AED_OFF), connection(NONE), lastCompressionDepth(-1.0), shocks(0),
+: battery(100), status(AED_OFF), connection(NONE), shocks(0),
 patient(new Patient(PSC_HEART_ATTACK))
 {
     AEDWorker* worker = new AEDWorker;
@@ -53,67 +53,54 @@ void AED::setPadPlacement(ConnectionStatus connection) {
 }
 
 void AED::handleTurnOn() {
-    if(status == CHANGE_BATTERY) return;
+    if(battery <= 0) return;
     status = AED_ON;
     connection = NONE;
     emit update(status);
     emit initSelfTest();
 }
 void AED::handleSelfTest() {
-    if(status == AED_OFF) return;
+    if(status < 2) return;
+    addLoadOnBattery(2);
     if (!doesTestFail){
         status = UNIT_OK;
         emit initCheckResponsiveness();
-    }
-    else {
+    } else {
         status = AED_TEST_FAIL;
     }
     emit update(status);
 }
 void AED::handleChangeBattery() {
-    if (battery == 0) {
+    if (battery <= 0) {
         status = CHANGE_BATTERY;
         emit initChangeBattery();
+    } else {
+        emit initTurnOn();
     }
-    else {
-        emit initSelfTest();
-    }
-
     emit update(status);
 }
 void AED::handleTurnOff() {
     status = AED_OFF;
     connection = NONE;
-    lastCompressionDepth = -1.0;
     emit update(status);
 }
 void AED::handleCheckResponsiveness() {
-    if(status == AED_OFF) return;
+    if(status < 2) return;
     status = CHECK_RESPONSIVENESS;
-    if (battery == 0){emit initChangeBattery();}
-    else {
-        emit initCallHelp();
-    }
     emit update(status);
+    emit initCallHelp();
 }
 void AED::handleCallHelp() {
-    if(status == AED_OFF) return;
+    if(status < 2) return;
     status = CALL_HELP;
-    if (battery == 0){emit initChangeBattery();}
-    else {
-        emit initAttachPads();
-    }
     emit update(status);
+    emit initAttachPads();
 }
 void AED::handleAttachPads() {
-    if(status == AED_OFF) return;
+    if(status < 2) return;
     addLoadOnBattery(1);
     status = ATTACH_PADS;
     emit update(status);
-    if (battery == 0) {
-        emit initChangeBattery();
-        return;
-    }
     if(connection == GOOD) {
         emit initTypeOfPads();
     } else if (connection == BAD) {
@@ -123,18 +110,17 @@ void AED::handleAttachPads() {
     }
 }
 void AED::handleCheckConnection() {
-    if(status == AED_OFF || status == CHANGE_BATTERY) return;
+    if(status < 2) return;
     addLoadOnBattery(1);
     if (connection != GOOD) {
         emit updateDisplay("CHECK CONNECTION HABIBI");
         emit initCheckConnection();
-    }
-    else {
+    } else {
         emit initTypeOfPads();
     }
 }
 void AED::handleTypeOfPads() {
-    if(status == AED_OFF) return;
+    if(status < 2) return;
     emit updateDisplay(patient->getAge() < 8 ? "CHILD PADZ" : "ADULT PADZ");
     emit initDontTouchPatient();
 }
@@ -164,60 +150,57 @@ void AED::handleStartCpr() {
     }
     if(patient->shockable()) {
         emit initShockAdvised();
-        return;
     } else if (!patient->cprAble()) {
         emit initPatientHealthy();
-        return;
+    } else {
+        emit initStartCpr();
     }
-    emit initStartCpr();
 }
 void AED::handleShockAdvised() {
-    if(status == AED_OFF) return;
+    if(status < 7) return;
     if(status != SHOCK_ADVISED) {
         status = SHOCK_ADVISED;
         emit update(status);
     }
     if(patient->shockable()) {
         emit initShockAdvised();
-        return;
     } else if (patient->cprAble()) {
         emit initStartCpr();
-        return;
+    } else {
+        emit initPatientHealthy();
     }
-    emit initPatientHealthy();
 }
 void AED::handlePatientHealthy() {
-    if(status == AED_OFF) return;
+    if(status < 7) return;
     status = AED_PATIENT_HEALTHY;
     emit update(status);
     if(patient->shockable()) {
         emit initShockAdvised();
-        return;
     } else if (patient->cprAble()) {
         emit initStartCpr();
-        return;
+    } else {
+        emit initPatientHealthy();
     }
-    emit initPatientHealthy();
 }
 
 void AED::administerShock() {
+    if(status != SHOCK_ADVISED) return;
     updateDisplay("Administering shock in 3...2...1");
     emit initShock();
 }
 
 
 void AED::cpr(double depth) {
-    if(status == AED_OFF) return;
+    if(status < 6) return;
     addLoadOnBattery(1);
+    emit update(status);
     CompressionResult result = patient->cpr(depth);
     std::vector<std::string> resultStr = { "GOOD COMPRESSION", "HARDER ;)", "SOFTER :(", "SLOWER :(", "FASTER ;)" };
     emit updateDisplay(resultStr.at(result));
     if(patient->shockable()) {
         emit initShockAdvised();
-        return;
     } else if (!patient->cprAble()) {
         emit initPatientHealthy();
-        return;
     }
 }
 void AED::handleUpdateHeartRate() {
@@ -227,9 +210,10 @@ void AED::handleUpdateHeartRate() {
  * Administers a shock
  */
 void AED::handleShock() {
-    if(status == AED_OFF) return;
+    if(status < 6) return;
     if(battery <= 10) {
         emit updateDisplay("NOT ENOUGH BATTERY FOR SHOCK");
+        emit initChangeBattery();
         return;
     }
     addLoadOnBattery(10);

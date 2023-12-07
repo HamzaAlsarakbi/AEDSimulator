@@ -34,6 +34,7 @@ private:
     int age;
     int minCompressionDepth;
     int maxCompressionDepth;
+    milliseconds prevCompression;
     Heart* heart;
     std::default_random_engine gen;
 };

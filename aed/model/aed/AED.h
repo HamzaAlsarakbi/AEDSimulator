@@ -11,9 +11,9 @@
 using namespace std;
 
 enum AEDStatus {
-    AED_ON,                 // 0
-    AED_OFF,                // 1
-    CHANGE_BATTERY,         // 2
+    AED_OFF,                // 0
+    CHANGE_BATTERY,         // 1
+    AED_ON,                 // 2
     AED_TEST_FAIL,          // 3
     UNIT_OK,                // 4
 
@@ -60,14 +60,12 @@ public:
 
 private:
     QThread thread;
-    bool threadActive;
     AEDStatus status;
     int battery;
     int shocks;
     bool doesTestFail = false;
     Patient* patient;
     ConnectionStatus connection;
-    double lastCompressionDepth;
     void addLoadOnBattery(int load);
 
 public slots:
