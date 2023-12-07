@@ -179,6 +179,11 @@ void MainWindow::ageSliderHandler(int value) {
     aedDevice->setAge(value);
 }
 
+/**
+ * @brief Updates the starting condition of the patient on the UI
+ * 
+ * @param condition (QString) the starting condition of the patient
+ */
 void MainWindow::patientStartingConditionHandler(QString condition) {
     std::string c = condition.toStdString();
     aedDevice->resetPatient(
@@ -188,24 +193,45 @@ void MainWindow::patientStartingConditionHandler(QString condition) {
         PSC_HEART_ATTACK);
 }
 
+/**
+ * @brief Connects the UI's turn on button to the device
+ * 
+ */
 void MainWindow::turnOnHandler(){
     emit aedDevice->initTurnOn();
 }
 
+/**
+ * @brief Sets the connection of the pad to good
+ * 
+ */
 void MainWindow::padsCorrectHandler(){
     aedDevice->setPadPlacement(GOOD);
 }
 
+/**
+ * @brief Sets the connection of the pad to bad
+ * 
+ */
 void MainWindow::padsIncorrectHandler(){
     aedDevice->setPadPlacement(BAD);
 }
 
+/**
+ * @brief Connects the UI's shock button to the shocking functionality
+ * 
+ */
 void MainWindow::administerShockHandler(){
     ui->administerShockButton->setDisabled(true);
     aedDevice->administerShock();
 }
 
+/**
+ * @brief Connects the UI's CPR button to the cpr functionality
+ * 
+ */
 void MainWindow::cprHandler(){
+    // Applies some variance to the cpr depth
     int random = ui->baseDepthVarianceSlider->value();
     int variance = 0;
     if(random > 0)
@@ -217,10 +243,16 @@ void MainWindow::cprHandler(){
     int max = aedDevice->getMaxCompressionDepth();
     max -= min;
     actualDepth -= min;
+    
+    // Displays the cpr depth on the display to the right
     double translatedDepth = (100.0/max) * actualDepth;
     ui->depthSlider->setValue((int) translatedDepth);
 }
 
+/**
+ * @brief connects the UI's fail test button to the fail test functionality
+ * 
+ */
 void MainWindow::failTestHandler(){
     aedDevice->setTestFail(aedDevice->isPassing());
     ui->failTestButton->setText(aedDevice->isPassing() ? "Fail Test" : "Pass Test");
