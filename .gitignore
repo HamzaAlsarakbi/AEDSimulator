@@ -2,3 +2,5 @@
 **/.vscode
 **/cmake-build-*
 build-aed-Desktop-Debug/
+
+.DS_Store
