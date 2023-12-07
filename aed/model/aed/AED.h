@@ -23,8 +23,8 @@ enum AEDStatus {
     DONT_TOUCH_PATIENT,     // 8
 
     SHOCK_ADVISED,          // 9
-    SHOCK_NOT_ADVISED,      // 10
-    START_CPR,              // 11
+    START_CPR,              // 10
+    SHOCK_NOT_ADVISED,      // 11
     AED_PATIENT_HEALTHY     // 12
 };
 
@@ -43,6 +43,7 @@ public:
     ConnectionStatus getConnectionStatus() { return connection; }
     int getBattery() const { return battery; }
     int getShocksCount() const { return shocks; }
+    bool isHeartNull() const { return patient->getHeart() == nullptr; }
     int getHeartRate() const { return patient->getHeartRate(); }
     HeartStatus getHeartStatus() const { return patient->getHeart()->getStatus(); }
     long long getBasePulseTime() const { return patient->getHeart()->getBasePulseTime(); }
@@ -57,6 +58,7 @@ public:
     void setAge(int value) { patient->setAge(value); }
     void cpr(double depth);
     void administerShock();
+    void resetPatient(PatientSCondition condition);
 
 private:
     QThread thread;
