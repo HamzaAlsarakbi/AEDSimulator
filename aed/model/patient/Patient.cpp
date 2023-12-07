@@ -37,7 +37,7 @@ void Patient::shock() {
 }
 
 bool Patient::cprAble() {
-    return getHeartRate() < 40;
+    return getHeartRate() < 40 || getHeart()->getStatus() != HEART_NORMAL;
 }
 
 CompressionResult Patient::cpr(int compressionDepth){

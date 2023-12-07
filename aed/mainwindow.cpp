@@ -10,14 +10,17 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     aedDevice = new AED();
-
+    ecgWidget = new EcgWidget(ui->ecgGraphWidget);
+    ui->ecgGraphWidget->layout()->addWidget(ecgWidget);
     connectUI();
     update(aedDevice->getStatus());
     ui->depthSlider->setDisabled(true);
+//    emit drawEcg({1000, 2000, 3000, 4000, 5000, 6000});
 }
 
 MainWindow::~MainWindow()
 {
+    delete ecgWidget;
     delete ui;
     delete aedDevice;
 }
@@ -27,8 +30,10 @@ void MainWindow::connectUI() {
     connect(ui->baseDepthSlider, &QSlider::valueChanged, this, &MainWindow::baseDepthSliderHandler);
     connect(ui->baseDepthVarianceSlider, &QSlider::valueChanged, this, &MainWindow::baseDepthVarianceSliderHandler);
     connect(ui->ageSlider, &QSlider::valueChanged, this, &MainWindow::ageSliderHandler);
+//    connect(this, SIGNAL(drawEcg(std::vector<long long>)), ecgWidget, SLOT(draw(std::vector<long long>)));
+    connect(this, SIGNAL(drawEcg(int)), ecgWidget, SLOT(draw(int)));
 
-    // Buttonss
+    // Buttons
     connect(ui->turnOnButton, &QPushButton::pressed, this, &MainWindow::turnOnHandler);
     connect(ui->turnOffButton, SIGNAL(pressed()), aedDevice, SLOT(handleTurnOff()));
     connect(ui->attachDefibPadsCorrectlyButton, &QPushButton::pressed, this, &MainWindow::padsCorrectHandler);
@@ -65,8 +70,10 @@ void MainWindow::update(AEDStatus status) {
     ui->changeBatteriesButton->setVisible(false);
     ui->attachDefibPadsCorrectlyButton->setVisible(status == ATTACH_PADS && aedDevice->getConnectionStatus() != GOOD);
     ui->attachDefibPadsIncorrectlyButton->setVisible(status == ATTACH_PADS && aedDevice->getConnectionStatus() == NONE);
-    ui->administerShockButton->setVisible(status == SHOCK_ADVISED);
-    ui->cprButton->setVisible(status == START_CPR);
+    ui->administerShockButton->setVisible(status > 9);
+    ui->administerShockButton->setDisabled(status != SHOCK_ADVISED);
+    ui->cprButton->setVisible(status > 9);
+    ui->cprButton->setDisabled(status != START_CPR);
 
 //    Patient Controls
     ui->ageWidget->setVisible(aedDevice->getConnectionStatus() == GOOD);
@@ -86,6 +93,7 @@ void MainWindow::updateHeartRate() {
     ui->pulsesCountLabel->setText(QString::number(aedDevice->getPulsesCount()));
     std::vector<std::string> statuses = { "NORMAL", "VTACH", "VFIB", "ARISTOTLE" };
     ui->heartStatusLabel->setText(QString::fromStdString(statuses.at(aedDevice->getHeartStatus())));
+    emit drawEcg(aedDevice->getHeartRate());
 }
 
 void MainWindow::batterySliderHandler(int value) {
@@ -118,6 +126,7 @@ void MainWindow::padsIncorrectHandler(){
 }
 
 void MainWindow::administerShockHandler(){
+    ui->administerShockButton->setDisabled(true);
     aedDevice->administerShock();
 }
 

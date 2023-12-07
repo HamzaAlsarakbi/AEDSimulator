@@ -136,30 +136,30 @@ void AED::handleCheckConnection() {
     }
     else {
         emit initTypeOfPads();
-        emit update(status);
         emit updateDisplay(patient->getAge() < 8 ? "CHILD PADZ" : "ADULT PADZ");
     }
 }
 void AED::handleTypeOfPads() {
     if(status == AED_OFF) return;
     emit initDontTouchPatient();
-    emit update(status);
 }
 void AED::handleDontTouchPatient() {
     if(status == AED_OFF) return;
     battery -= 4;
     status = DONT_TOUCH_PATIENT;
+    emit update(status);
     // keep checking until you have a proper heart rate
     if(patient->getHeartRate() == -1) {
         emit initDontTouchPatient();
+        return;
     } else if(patient->shockable()) {
         emit initShockAdvised();
+        return;
     } else if (patient->cprAble()) {
         emit initStartCpr();
-    } else {
-        emit initPatientHealthy();
+        return;
     }
-    emit update(status);
+    emit initPatientHealthy();
 }
 void AED::handleStartCpr() {
     if(status == AED_OFF) return;
@@ -178,6 +178,13 @@ void AED::handlePatientHealthy() {
     status = AED_PATIENT_HEALTHY;
     emit initUpdateHeartRate();
     emit update(status);
+    if(patient->shockable()) {
+        emit initShockAdvised();
+        return;
+    } else if (patient->cprAble()) {
+        emit initStartCpr();
+        return;
+    }
     emit initPatientHealthy();
 }
 
@@ -195,8 +202,10 @@ void AED::cpr(double depth) {
     emit updateDisplay(resultStr.at(result));
     if(patient->shockable()) {
         emit initShockAdvised();
+        return;
     } else if (!patient->cprAble()) {
         emit initPatientHealthy();
+        return;
     }
 }
 void AED::handleUpdateHeartRate() {

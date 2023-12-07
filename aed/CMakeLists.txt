@@ -11,9 +11,14 @@ add_subdirectory(tests)
 
 include_directories(.)
 
+find_package(Qt6 COMPONENTS Widgets REQUIRED)
 find_package(Qt6Core REQUIRED)
 find_package(Qt6Widgets REQUIRED)
 find_package(Qt6Quick REQUIRED)
+
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
 # Create pulse library target
 add_library(pulse
@@ -44,8 +49,9 @@ add_executable(aed
     model/aed/AED.h
     model/patient/Patient.h
     model/aed/AED.cpp
-    model/Rescuer.cpp
-    model/patient/Patient.cpp)
+        model/patient/Patient.cpp
+        ui/EcgWidget.h
+        ui/EcgWidget.cpp)
 
 # Link pulse and heart libraries with the executable
 target_link_libraries(aed patient heart pulse Qt6::Widgets Qt6::Core Qt6::Quick)

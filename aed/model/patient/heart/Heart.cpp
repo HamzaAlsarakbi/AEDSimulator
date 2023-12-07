@@ -78,6 +78,9 @@ void Heart::updateState()
         const auto elapsedTimeSinceLastTick = duration_cast<milliseconds>(currentTick - lastTick).count();
         totalElapsedTime += duration_cast<milliseconds>(currentTick - lastTick).count();
         lastTick = currentTick;
+        if(pulses.empty()) {
+            heartRate = 0;
+        }
 
         // Check if it's time for the next pulse
         // compare elapsed time since last pulse to pulse duration
@@ -122,9 +125,7 @@ void Heart::updateState()
             }
 
             // Calculate heartRate
-            if(pulses.empty()) {
-                heartRate = 0;
-            } else if (isRegular) {
+            if (isRegular) {
                 if(status == VFIB) status = HEART_NORMAL;
                 // Use big-box method to calculate heart rate
                 if(pulses.size() >= 2){
@@ -134,15 +135,15 @@ void Heart::updateState()
                 }
             } else {
                 status = VFIB; // commenting this out makes heartNormalStatusTest to pass but status wrong for heartVfibTest
-                // Use 6-second method to calculate heart rate
-                heartRate = pulses.size() * 10;
+                heartRate = getBasePulseTime() < 10000 ? pulses.size()*10 : pulses.size() >= 2 ? 60000 / (pulses[1]->getTime() - pulses[0]->getTime()).count() : 0;
             }
         }
 
-        while(!pulses.empty()) {
-            Pulse* curPulse = pulses.at(0);
-            auto durationSincePulse = duration_cast<seconds>(milliseconds (totalElapsedTime)- curPulse->getTime());
-            if (durationSincePulse.count() < 6) break;
+        int removeDuration = getBasePulseTime() < 10000 ? 6 : 60;
+        while (!pulses.empty()) {
+            Pulse *curPulse = pulses.at(0);
+            auto durationSincePulse = duration_cast<seconds>(milliseconds(totalElapsedTime) - curPulse->getTime());
+            if (durationSincePulse.count() < removeDuration) break;
             delete curPulse;
             pulses.erase(pulses.begin());
         }

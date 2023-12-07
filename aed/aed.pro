@@ -14,7 +14,8 @@ SOURCES += \
     model/aed/AED.cpp \
     model/patient/Patient.cpp \
     model/patient/heart/Heart.cpp \
-    model/patient/heart/pulse/Pulse.cpp
+    model/patient/heart/pulse/Pulse.cpp \
+    ui/EcgWidget.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -22,7 +23,8 @@ HEADERS += \
     model/aed/AEDWorker.h \
     model/patient/Patient.h \
     model/patient/heart/Heart.h \
-    model/patient/heart/pulse/Pulse.h
+    model/patient/heart/pulse/Pulse.h \
+    ui/EcgWidget.h
 
 FORMS += \
     mainwindow.ui
