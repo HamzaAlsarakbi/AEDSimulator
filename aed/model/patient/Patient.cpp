@@ -49,16 +49,16 @@ CompressionResult Patient::cpr(int compressionDepth){
     long long duration = (timestamp - prevCompression).count();
     if(prevCompression.count() > 0) {
         prevCompression = timestamp;
-        if(duration > 600) {
+        if(duration > 700) {
             return COMP_FASTER;
-        } else if(duration < 500) {
+        } else if(duration < 400) {
             return COMP_SLOWER;
         }
     }
     prevCompression = timestamp;
 
-    long long basePulseTime = 60000/getHeartRate();
-    long long pulseTimeApproachDistance = fmin(abs(1100 - basePulseTime) / 2, 50);
+    long long basePulseTime = heart->getBasePulseTime();
+    long long pulseTimeApproachDistance = fmin(abs(1100 - basePulseTime) / 10, 1000);
     long long ptvApproachDistance = fmin(abs(heart->getPulseTimeVariance()) / 2, 5);
     basePulseTime += pulseTimeApproachDistance * (getHeartRate() > 60 ? 1 : -1);
     heart->setBasePulseTime(basePulseTime);
@@ -74,7 +74,7 @@ void Patient::reset(PatientSCondition condition){
     int random;
     switch(condition) {
         case PSC_ARISTOTLE:
-            heart->setBasePulseTime(100000); // .6 BPM
+            heart->setBasePulseTime(60005); // .6 BPM
             heart->setPulseTimeVariance(0);
             heart->setVtach(false);
             heart->setStatus(ARISTOTLE);

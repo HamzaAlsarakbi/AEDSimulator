@@ -2,7 +2,7 @@
 
 AED::AED()
 : battery(100), status(AED_OFF), connection(NONE), shocks(0),
-patient(new Patient(PSC_HEART_ATTACK))
+patient(new Patient(PSC_SUB40))
 {
     AEDWorker* worker = new AEDWorker;
     worker->moveToThread(&workerThread);

@@ -139,7 +139,8 @@ void Heart::updateState()
             }
         }
 
-        int removeDuration = getBasePulseTime() < 10000 ? 6 : 60;
+//        int removeDuration = getBasePulseTime() < 10000 ? 6 : 60;
+        int removeDuration = 6;
         while (!pulses.empty()) {
             Pulse *curPulse = pulses.at(0);
             auto durationSincePulse = duration_cast<seconds>(milliseconds(totalElapsedTime) - curPulse->getTime());
