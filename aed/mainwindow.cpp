@@ -15,7 +15,14 @@ MainWindow::MainWindow(QWidget *parent)
     connectUI();
     update(aedDevice->getStatus());
     ui->depthSlider->setDisabled(true);
-//    emit drawEcg({1000, 2000, 3000, 4000, 5000, 6000});
+    emit drawEcg({
+        Pulse(milliseconds(1000), PULSE_NORMAL),
+        Pulse(milliseconds(2000), PULSE_NORMAL),
+        Pulse(milliseconds(3000), PULSE_NORMAL),
+        Pulse(milliseconds(4000), PULSE_NORMAL),
+        Pulse(milliseconds(5000), PULSE_NORMAL),
+        Pulse(milliseconds(6000), PULSE_NORMAL),
+    });
 }
 
 MainWindow::~MainWindow()
@@ -31,8 +38,7 @@ void MainWindow::connectUI() {
     connect(ui->baseDepthVarianceSlider, &QSlider::valueChanged, this, &MainWindow::baseDepthVarianceSliderHandler);
     connect(ui->ageSlider, &QSlider::valueChanged, this, &MainWindow::ageSliderHandler);
     connect(ui->startingConditionBox, SIGNAL(currentTextChanged(QString)), this, SLOT(patientStartingConditionHandler(QString)));
-//    connect(this, SIGNAL(drawEcg(std::vector<long long>)), ecgWidget, SLOT(draw(std::vector<long long>)));
-    connect(this, SIGNAL(drawEcg(int)), ecgWidget, SLOT(draw(int)));
+    connect(this, SIGNAL(drawEcg(std::vector<Pulse>)), ecgWidget, SLOT(draw(std::vector<Pulse>)));
 
     // Buttons
     connect(ui->turnOnButton, &QPushButton::pressed, this, &MainWindow::turnOnHandler);
@@ -41,7 +47,6 @@ void MainWindow::connectUI() {
     connect(ui->attachDefibPadsIncorrectlyButton, &QPushButton::pressed, this, &MainWindow::padsIncorrectHandler);
     connect(ui->failTestButton, &QPushButton::pressed, this, &MainWindow::failTestHandler);
     connect(ui->administerShockButton, &QPushButton::pressed, this, &MainWindow::administerShockHandler);
-    connect(ui->cprButton, &QPushButton::pressed, this, &MainWindow::cprHandler);
     connect(ui->cprButton, &QPushButton::pressed, this, &MainWindow::cprHandler);
     connect(aedDevice, SIGNAL(update(AEDStatus)), this, SLOT(update(AEDStatus)));
     connect(aedDevice, SIGNAL(updateDisplay(std::string)), this, SLOT(updateDisplay(std::string)));
@@ -63,7 +68,7 @@ void MainWindow::update(AEDStatus status) {
     ui->heartRateLabel->setVisible(status > 8);
     ui->batteryLabel->setText(status < 2 ? "" : QString::fromStdString(std::to_string(aedDevice->getBattery()) + "%"));
     ui->shocksCount->setText(status < 2 ? "" : QString::number(aedDevice->getShocksCount()));
-    ecgWidget->setVisible(status > 8);
+    // ecgWidget->setVisible(status > 8);
 //    AED Lights
     ui->testPassIndicator->setStyleSheet(status == AED_OFF || status == AED_ON ? GRAY : aedDevice->isPassing() ? GREEN : RED);
     for(int i = 0; i < indicators.size(); i++) {
@@ -101,9 +106,9 @@ void MainWindow::updateHeartRate() {
     ui->qrsWidthLabel->setText(QString::number(aedDevice->getBasePulseTime()));
     ui->qrsWidthVarianceLabel->setText(QString::number(aedDevice->getPulseTimeVariance()));
     ui->pulsesCountLabel->setText(QString::number(aedDevice->getPulsesCount()));
-    std::vector<std::string> statuses = { "NORMAL", "VTACH", "VFIB", "ARISTOTLE" };
+    std::vector<std::string> statuses = { "NORMAL", "VTACH", "VFIB", "ASYSTOLE" };
     ui->heartStatusLabel->setText(QString::fromStdString(statuses.at(aedDevice->getHeartStatus())));
-    emit drawEcg(aedDevice->getHeartRate());
+    // emit drawEcg(aedDevice->getHeartRate());
 }
 
 void MainWindow::batterySliderHandler(int value) {
@@ -127,7 +132,7 @@ void MainWindow::patientStartingConditionHandler(QString condition) {
     std::string c = condition.toStdString();
     aedDevice->resetPatient(
         c == "Normal" ? PSC_NORMAL :
-        c == "Aristotle" ? PSC_ARISTOTLE :
+        c == "Asystole" ? PSC_ASYSTOLE :
         c == "Sub 40" ? PSC_SUB40 :
         PSC_HEART_ATTACK);
 }

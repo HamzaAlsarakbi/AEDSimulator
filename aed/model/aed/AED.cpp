@@ -194,7 +194,7 @@ void AED::cpr(double depth) {
     if(status < 6) return;
     emit update(status);
     CompressionResult result = patient->cpr(depth);
-    std::vector<std::string> resultStr = { "GOOD COMPRESSION", "HARDER ;)", "SOFTER :(", "SLOWER :(", "FASTER ;)" };
+    std::vector<std::string> resultStr = { "GOOD COMPRESSION", "HARDER", "SOFTER", "SLOWER", "FASTER" };
     emit updateDisplay(resultStr.at(result));
     if(patient->shockable()) {
         emit initShockAdvised();
