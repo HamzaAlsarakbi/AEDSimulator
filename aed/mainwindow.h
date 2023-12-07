@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "model/aed/AED.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -15,7 +16,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-
 public slots:
     void batterySliderHandler(int value);
     void baseDepthSliderHandler(int value);
@@ -23,9 +23,19 @@ public slots:
     void ageSliderHandler(int value);
     void qrsWidthSliderHandler(int value);
     void qrsWidthVarianceSliderHandler(int value);
+    
+    void turnOnHandler();
+    void changeBatteriesHandler();
+    void padsCorrectHandler();
+    void padsIncorrectHandler();
+    void administerShockHandler();
+    void cprHandler();
+    void failTestHandler();
+    void update(AEDStatus status);
 
 private:
     Ui::MainWindow *ui;
+    AED* aedDevice;
     void connectUI();
 };
 #endif // MAINWINDOW_H

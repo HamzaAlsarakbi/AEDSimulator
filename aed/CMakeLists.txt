@@ -40,16 +40,11 @@ add_executable(aed
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
-    model/Rescuer.h
     model/aed/AED.h
     model/patient/Patient.h
     model/aed/AED.cpp
     model/Rescuer.cpp
-    model/patient/Patient.cpp
-    model/aed/step/Step.h
-    model/aed/step/action/Action.h
-    model/aed/step/action/Action.cpp
-    model/aed/step/Step.cpp)
+    model/patient/Patient.cpp)
 
 # Link pulse and heart libraries with the executable
 target_link_libraries(aed patient heart pulse Qt6::Widgets Qt6::Core Qt6::Quick)
