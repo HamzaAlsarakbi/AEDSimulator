@@ -129,13 +129,13 @@ void Heart::updateState()
                 if(status == VFIB) status = HEART_NORMAL;
                 // Use big-box method to calculate heart rate
                 if(pulses.size() >= 2){
-                    heartRate = 60,000 / (pulses[1]->getTime() - pulses[0]->getTime()).count();
+                    heartRate = 60000 / (pulses[1]->getTime() - pulses[0]->getTime()).count();
                 } else {
                     heartRate = 0;
                 }
             } else {
                 status = VFIB; // commenting this out makes heartNormalStatusTest to pass but status wrong for heartVfibTest
-                heartRate = getBasePulseTime() < 10000 ? pulses.size()*10 : pulses.size() >= 2 ? 60000 / (pulses[1]->getTime() - pulses[0]->getTime()).count() : 0;
+                heartRate = getBasePulseTime() < 10000 ? pulses.size()*10 : pulses.size() >= 2 ? 60000 / (pulses[pulses.size()-1]->getTime() - pulses[pulses.size()-2]->getTime()).count() : 0;
             }
         }
 

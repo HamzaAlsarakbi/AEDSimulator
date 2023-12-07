@@ -44,7 +44,7 @@ CompressionResult Patient::cpr(int compressionDepth){
     if(compressionDepth < minCompressionDepth) return COMP_HARDER;
     if(compressionDepth > maxCompressionDepth) return COMP_SOFTER;
     long long basePulseTime = 60000/getHeartRate();
-    long long pulseTimeApproachDistance = fmin(abs(1000 - basePulseTime) / 2, 50);
+    long long pulseTimeApproachDistance = fmin(abs(1100 - basePulseTime) / 2, 50);
     long long ptvApproachDistance = fmin(abs(heart->getPulseTimeVariance()) / 2, 5);
 //        getHeartRate() < 60 ? basePulseTime += pulseTimeApproachDistance : basePulseTime -= pulseTimeApproachDistance;
     basePulseTime += pulseTimeApproachDistance * (getHeartRate() > 60 ? 1 : -1);

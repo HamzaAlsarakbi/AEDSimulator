@@ -114,6 +114,7 @@ void AED::handleAttachPads() {
     if(status == AED_OFF) return;
     battery--;
     status = ATTACH_PADS;
+    emit update(status);
     if (battery == 0) {
         emit initChangeBattery();
         return;
@@ -125,7 +126,6 @@ void AED::handleAttachPads() {
     } else {
         emit initAttachPads();
     }
-    emit update(status);
 }
 void AED::handleCheckConnection() {
     if(status == AED_OFF) return;
@@ -136,11 +136,11 @@ void AED::handleCheckConnection() {
     }
     else {
         emit initTypeOfPads();
-        emit updateDisplay(patient->getAge() < 8 ? "CHILD PADZ" : "ADULT PADZ");
     }
 }
 void AED::handleTypeOfPads() {
     if(status == AED_OFF) return;
+    emit updateDisplay(patient->getAge() < 8 ? "CHILD PADZ" : "ADULT PADZ");
     emit initDontTouchPatient();
 }
 void AED::handleDontTouchPatient() {
