@@ -13,7 +13,7 @@ enum HeartStatus
     HEART_NORMAL,
     VTACH,
     VFIB,
-    ARISTOTLE
+    ASYSTOLE
 };
 
 class Heart
@@ -32,6 +32,7 @@ public:
     long long getPulseTimeVariance() const {return pulseTimeVariance.count();};
     void shock();
     long long generatePulseDuration();
+    PulseType getCurrentPulseType();
     void clearPulses();
 
 private:

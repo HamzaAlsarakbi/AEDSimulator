@@ -9,18 +9,19 @@
 #include <QWidget>
 #include <QPainter>
 #include <cmath>
+#include "../model/patient/heart/pulse/Pulse.h"
 
 class EcgWidget : public QWidget {
     Q_OBJECT
 public:
     explicit EcgWidget(QWidget *parent=nullptr);
 public slots:
-    void draw(int heartRate);
+    void draw(std::vector<Pulse> pulses);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
 private:
-    std::vector<long long> timestamps;
+    std::vector<Pulse> pulses;
     int heartRate;
 };
 

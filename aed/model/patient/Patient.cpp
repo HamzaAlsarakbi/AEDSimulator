@@ -49,6 +49,7 @@ CompressionResult Patient::cpr(int compressionDepth){
     long long duration = (timestamp - prevCompression).count();
     if(prevCompression.count() > 0) {
         prevCompression = timestamp;
+        // std::cout << "duration: " << duration << std::endl;
         if(duration > 700) {
             return COMP_FASTER;
         } else if(duration < 400) {
@@ -78,11 +79,11 @@ void Patient::reset(PatientSCondition condition){
     delete temp;
     heart = new Heart();
     switch(condition) {
-        case PSC_ARISTOTLE:
+        case PSC_ASYSTOLE:
             heart->setBasePulseTime(60005); // .6 BPM
             heart->setPulseTimeVariance(0);
             heart->setVtach(false);
-            heart->setStatus(ARISTOTLE);
+            heart->setStatus(ASYSTOLE);
             break;
         case PSC_SUB40:
             // BPM is not immediately < 40 because of the variance that could potentially go over 40, rendering
