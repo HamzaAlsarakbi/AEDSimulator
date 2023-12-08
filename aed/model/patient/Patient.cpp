@@ -22,6 +22,12 @@ Patient::Patient(PatientSCondition condition)
 Patient::~Patient() {
     delete heart;
 }
+
+/**
+ * @brief Changes the age of the patient
+ * 
+ * @param age (int) the age of the patient
+ */
 void Patient::setAge(int age) {
     this->age = age;
     if(age > 8) {
@@ -33,25 +39,48 @@ void Patient::setAge(int age) {
     }
 }
 
+/**
+ * @brief Determines whether the heartrate is shockable or not
+ * 
+ * @return true (bool) The heartrate is shockable
+ * @return false (bool) The heartrate is not shockable
+ */
 bool Patient::shockable(){
     bool isCardiacArrest = (heart->getStatus() == VTACH || heart->getPulseTimeVariance() > 0);
     return (getHeartRate() > 120 && isCardiacArrest);
 }
+
 /**
- * Simulates the administration of a shock
+ * @brief Simulates the administration of a shock
+ * 
  */
 void Patient::shock() {
     if(!shockable()) return;
     heart->shock();
 }
 
+/**
+ * @brief Determines whether the patient requires CPR
+ * 
+ * @return (bool) true The patient requires CPR
+ * @return (bool) false The patient do not require CPR
+ */
 bool Patient::cprAble() {
     return getHeartRate() < 40 || getHeart()->getStatus() != HEART_NORMAL;
 }
 
+/**
+ * @brief simulates 1 compression in CPR
+ * 
+ * @param compressionDepth (int) The depth of compression for CPR
+ * @return CompressionResult (CompressionResult) The feedback to the CPR provided
+ */
 CompressionResult Patient::cpr(int compressionDepth){
+    // Feedback on the depth of compression
     if(compressionDepth < minCompressionDepth) return COMP_HARDER;
     if(compressionDepth > maxCompressionDepth) return COMP_SOFTER;
+
+    // Feedback on the speed of compression
     auto curTime = system_clock::now();
     milliseconds timestamp = duration_cast<milliseconds>(curTime.time_since_epoch());
     long long duration = (timestamp - prevCompression).count();
@@ -66,6 +95,7 @@ CompressionResult Patient::cpr(int compressionDepth){
     }
     prevCompression = timestamp;
 
+    // Otherwise, good compressions
     long long basePulseTime = heart->getBasePulseTime();
     long long pulseTimeApproachDistance = fmin(abs(1100 - basePulseTime) / 10, 1000);
     long long ptvApproachDistance = fmin(abs(heart->getPulseTimeVariance()) / 2, 5);
@@ -78,6 +108,11 @@ CompressionResult Patient::cpr(int compressionDepth){
     return COMP_GOOD;
 }
 
+/**
+ * @brief Resets the condition of the patient to whatever the parameter takes in
+ * 
+ * @param condition (PatientSCondition) the new condition of the patient
+ */
 void Patient::reset(PatientSCondition condition){
     std::uniform_int_distribution<> distribution;
     int random;
