@@ -15,14 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     connectUI();
     update(aedDevice->getStatus());
     ui->depthSlider->setDisabled(true);
-    emit drawEcg({
-        Pulse(milliseconds(1000), PULSE_NORMAL),
-        Pulse(milliseconds(2000), PULSE_NORMAL),
-        Pulse(milliseconds(3000), PULSE_NORMAL),
-        Pulse(milliseconds(4000), PULSE_NORMAL),
-        Pulse(milliseconds(5000), PULSE_NORMAL),
-        Pulse(milliseconds(6000), PULSE_NORMAL),
-    });
+
 }
 
 MainWindow::~MainWindow()
@@ -38,7 +31,7 @@ void MainWindow::connectUI() {
     connect(ui->baseDepthVarianceSlider, &QSlider::valueChanged, this, &MainWindow::baseDepthVarianceSliderHandler);
     connect(ui->ageSlider, &QSlider::valueChanged, this, &MainWindow::ageSliderHandler);
     connect(ui->startingConditionBox, SIGNAL(currentTextChanged(QString)), this, SLOT(patientStartingConditionHandler(QString)));
-    connect(this, SIGNAL(drawEcg(std::vector<Pulse>)), ecgWidget, SLOT(draw(std::vector<Pulse>)));
+    connect(this, SIGNAL(drawEcg(long long, std::vector<Pulse*>)), ecgWidget, SLOT(draw(long long, std::vector<Pulse*>)));
 
     // Buttons
     connect(ui->turnOnButton, &QPushButton::pressed, this, &MainWindow::turnOnHandler);
@@ -108,7 +101,7 @@ void MainWindow::updateHeartRate() {
     ui->pulsesCountLabel->setText(QString::number(aedDevice->getPulsesCount()));
     std::vector<std::string> statuses = { "NORMAL", "VTACH", "VFIB", "ASYSTOLE" };
     ui->heartStatusLabel->setText(QString::fromStdString(statuses.at(aedDevice->getHeartStatus())));
-    // emit drawEcg(aedDevice->getHeartRate());
+    emit drawEcg(aedDevice->getHeartTotalTime(), aedDevice->getPulses());
 }
 
 void MainWindow::batterySliderHandler(int value) {

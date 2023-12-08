@@ -35,7 +35,7 @@ public slots:
     void updateHeartRate();
 
 signals:
-   void drawEcg(std::vector<Pulse> pulses);
+   void drawEcg(long long, std::vector<Pulse*> pulses);
 
 private:
     EcgWidget* ecgWidget;

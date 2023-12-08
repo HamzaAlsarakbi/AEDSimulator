@@ -106,11 +106,11 @@ void Patient::reset(PatientSCondition condition){
             heart->setStatus(random == 0 ? VTACH : VFIB);
             break;
         default:
-            distribution = std::uniform_int_distribution<>(500, 1000); // [120-240] BPM
-            heart->setBasePulseTime(distribution(gen));
-            heart->setPulseTimeVariance(0);
+            // distribution = std::uniform_int_distribution<>(500, 1000); // [120-240] BPM
+            heart->setBasePulseTime(1000);
+            heart->setPulseTimeVariance(2);
             heart->setVtach(false);
-            heart->setStatus(HEART_NORMAL);
+            heart->setStatus(VFIB);
             break;
     }
 }

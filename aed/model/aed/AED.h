@@ -41,12 +41,14 @@ public:
     // Getters and setters
     AEDStatus getStatus() { return status; }
     ConnectionStatus getConnectionStatus() { return connection; }
+    long long getHeartTotalTime() const { return patient->getHeart()->getTotalTime(); }
     int getBattery() const { return battery; }
     int getShocksCount() const { return shocks; }
     bool isHeartNull() const { return patient->getHeart() == nullptr; }
     int getHeartRate() const { return patient->getHeartRate(); }
     HeartStatus getHeartStatus() const { return patient->getHeart()->getStatus(); }
     long long getBasePulseTime() const { return patient->getHeart()->getBasePulseTime(); }
+    std::vector<Pulse*> getPulses() const { return patient->getHeart()->getPulses(); }
     long long getPulseTimeVariance() const { return patient->getHeart()->getPulseTimeVariance(); }
     int getPulsesCount() const { return patient->getHeart()->getPulsesCount(); }
     bool isPassing() const { return !doesTestFail; }

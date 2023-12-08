@@ -16,13 +16,13 @@ class EcgWidget : public QWidget {
 public:
     explicit EcgWidget(QWidget *parent=nullptr);
 public slots:
-    void draw(std::vector<Pulse> pulses);
+    void draw(long long totalTime, std::vector<Pulse*> pulses);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
 private:
-    std::vector<Pulse> pulses;
-    int heartRate;
+    std::vector<Pulse*> pulses;
+    long long totalTime;
 };
 
 

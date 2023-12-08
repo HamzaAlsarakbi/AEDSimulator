@@ -33,6 +33,8 @@ public:
     void shock();
     long long generatePulseDuration();
     PulseType getCurrentPulseType();
+    long long getTotalTime() const { return totalElapsedTime; }
+    std::vector<Pulse *> getPulses() const { return pulses; }
     void clearPulses();
 
 private:
@@ -45,6 +47,7 @@ private:
     std::default_random_engine gen;
     std::uniform_int_distribution<> distribution;
     int heartRate;
+    long long totalElapsedTime;
     void updateState();
 };
 

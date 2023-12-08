@@ -8,7 +8,7 @@
 Heart::Heart()
     : threadActive(true), thread(&Heart::updateState, this), status(HEART_NORMAL),
       basePulseTime(milliseconds(1000)), pulseTimeVariance(milliseconds(0)), heartRate(-1),
-      distribution(std::uniform_int_distribution<>(0, INT32_MAX))
+      totalElapsedTime(0), distribution(std::uniform_int_distribution<>(0, INT32_MAX))
 {
     std::random_device rd;
     gen = std::default_random_engine(rd());
@@ -76,7 +76,6 @@ void Heart::updateState()
     const long long tickRate = 10; // milliseconds
 
     auto lastTick = high_resolution_clock::now();
-    long long totalElapsedTime = 0;
     bool isRegular = false;
     auto nextPulseTime = 0;
     while (threadActive)
@@ -99,7 +98,7 @@ void Heart::updateState()
             nextPulseTime = pulseDuration + totalElapsedTime;
 
             // Add a new pulse
-            std::cout << "["<< totalElapsedTime << "ms] Created a pulse at: " << totalElapsedTime << "ms, next pulse in " << pulseDuration <<  "ms, at " << nextPulseTime << std::endl;
+            // std::cout << "["<< totalElapsedTime << "ms] Created a pulse at: " << totalElapsedTime << "ms, next pulse in " << pulseDuration <<  "ms, at " << nextPulseTime << std::endl;
             pulses.push_back(new Pulse(milliseconds(totalElapsedTime), getCurrentPulseType()));
 
             // Check regularity
