@@ -13,7 +13,8 @@ enum HeartStatus
     HEART_NORMAL,
     VTACH,
     VFIB,
-    ASYSTOLE
+    ASYSTOLE,
+    DEAD
 };
 
 class Heart
@@ -25,9 +26,8 @@ public:
     void setStatus(HeartStatus hs) {this->status = hs;}
     int getHeartRate() const { return heartRate; }
     long long getBasePulseTime() const { return basePulseTime.count(); }
-    void setBasePulseTime(int newValue) { this->basePulseTime = milliseconds(newValue); }
+    void setBasePulseTime(int newValue);
     void setPulseTimeVariance(int newValue) { this->pulseTimeVariance = milliseconds(newValue); }
-    void setVtach(bool vtach);
     int getPulsesCount() const { return pulses.size(); }
     long long getPulseTimeVariance() const {return pulseTimeVariance.count();};
     void shock();
@@ -42,6 +42,8 @@ private:
     std::vector<Pulse *> pulses;
     duration<int64_t, std::milli> basePulseTime; // time to next
     duration<int64_t, std::milli> pulseTimeVariance;
+    long long nextPulseTime;
+    long long lastPulseTime;
     std::default_random_engine gen;
     std::uniform_int_distribution<> distribution;
     int heartRate;

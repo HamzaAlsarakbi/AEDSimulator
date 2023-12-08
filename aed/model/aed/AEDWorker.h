@@ -8,12 +8,10 @@
 class AEDWorker : public QObject {
     Q_OBJECT
 
-public:
-    using WaitCallback = std::function<void()>;
-
 private:
     // milliseconds
-    const unsigned long stepDuration = 1000;
+    const unsigned long stepDuration = 10;
+    const unsigned long dontTouchPatientDuration = 7000;
     const unsigned long testDuration = 10;
     const unsigned long turnOnDuration = 10;
     const unsigned long shockDuration = 3000;
@@ -48,7 +46,7 @@ public slots:
         emit readyTypeOfPads();
     }
     void waitDontTouchPatient() {
-        QThread::msleep(stepDuration);
+        QThread::msleep(dontTouchPatientDuration);
         emit readyDontTouchPatient();
     }
     void waitStartCpr() {

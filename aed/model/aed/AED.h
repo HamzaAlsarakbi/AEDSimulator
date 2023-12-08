@@ -24,8 +24,7 @@ enum AEDStatus {
 
     SHOCK_ADVISED,          // 9
     START_CPR,              // 10
-    SHOCK_NOT_ADVISED,      // 11
-    AED_PATIENT_HEALTHY     // 12
+    AED_PATIENT_HEALTHY     // 11
 };
 
 enum ConnectionStatus {

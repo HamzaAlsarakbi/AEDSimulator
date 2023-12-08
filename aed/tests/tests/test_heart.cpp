@@ -62,7 +62,7 @@ TEST(HeartTest, heartVtachStatusTest) {
     Heart heart;
 
     heart.setBasePulseTime(500);
-    heart.setVtach(true);
+    heart.(true);
 
     // Let the heart update for a while (aka put the test thread to sleep)
     std::cout << "waiting for pulses" << std::endl;

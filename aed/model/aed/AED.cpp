@@ -50,8 +50,8 @@ patient(new Patient(PSC_NORMAL))
  */
 AED::~AED(){
     workerThread.quit();
-    workerThread.wait();
     delete patient;
+    workerThread.wait();
 }
 
 /**
@@ -194,6 +194,7 @@ void AED::handleDontTouchPatient() {
     emit update(status);
     // keep checking until you have a proper heart rate
     if(patient->getHeartRate() == -1) {
+        emit updateDisplay("UNABLE TO GET A GOOD HEART RATE READING. RETRYING...");
         emit initDontTouchPatient();
         return;
     } else if(patient->shockable()) {
@@ -220,8 +221,6 @@ void AED::handleStartCpr() {
         emit initShockAdvised();
     } else if (!patient->cprAble()) {
         emit initPatientHealthy();
-    } else {
-        emit initStartCpr();
     }
 }
 
@@ -252,13 +251,6 @@ void AED::handlePatientHealthy() {
     if(status < 7) return;
     status = AED_PATIENT_HEALTHY;
     emit update(status);
-    if(patient->shockable()) {
-        emit initShockAdvised();
-    } else if (patient->cprAble()) {
-        emit initStartCpr();
-    } else {
-        emit initPatientHealthy();
-    }
 }
 
 /**
@@ -267,7 +259,7 @@ void AED::handlePatientHealthy() {
  */
 void AED::administerShock() {
     if(status != SHOCK_ADVISED) return;
-    updateDisplay("Administering shock in 3...2...1");
+    updateDisplay("ADMINISTERING SHOCK IN 3...2...1");
     emit initShock();
 }
 
@@ -286,6 +278,10 @@ void AED::cpr(double depth) {
         emit initShockAdvised();
     } else if (!patient->cprAble()) {
         emit initPatientHealthy();
+    } else if(patient->getHeartRate() > 60) {
+        status = DONT_TOUCH_PATIENT;
+        emit update(status);
+        emit initDontTouchPatient();
     }
 }
 
@@ -311,7 +307,8 @@ void AED::handleShock() {
     addLoadOnBattery(10);
     shocks++;
     patient->shock();
-    emit initStartCpr();
+    emit updateDisplay("SHOCK ADMINISTERED, ANALYZING PATIENT");
+    emit initDontTouchPatient();
 }
 
 /**

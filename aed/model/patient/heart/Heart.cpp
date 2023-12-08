@@ -7,9 +7,9 @@
  * @brief - qrsWidthVariance: 0 milliseconds
  */
 Heart::Heart()
-    : threadActive(true), thread(&Heart::updateState, this), status(HEART_NORMAL),
-      basePulseTime(milliseconds(1000)), pulseTimeVariance(milliseconds(0)), heartRate(-1),
-      distribution(std::uniform_int_distribution<>(0, INT32_MAX))
+    : threadActive(true), thread(&Heart::updateState, this), status(ASYSTOLE),
+      basePulseTime(milliseconds(1000)), pulseTimeVariance(milliseconds(0)), heartRate(-1), nextPulseTime(0),
+      lastPulseTime(0), distribution(std::uniform_int_distribution<>(0, INT32_MAX))
 {
     std::random_device rd;
     gen = std::default_random_engine(rd());
@@ -23,33 +23,14 @@ Heart::~Heart()
 {
     threadActive = false;
     // wait for thread to finish
+    std::cout << "waiting for heart thread to terminate" << std::endl;
     thread.join();
-
     while (!pulses.empty())
     {
         delete pulses.at(pulses.size() - 1);
         pulses.pop_back();
     }
 }
-
-/**
- * @brief Sets the heart status to Vtack if allowed (normal if not)
- * 
- * @param vtach (bool) whether the heart condition is Vtack or not 
- */
-void Heart::setVtach(bool vtach)
-{
-    if(vtach) {
-        if (status == VFIB)
-            return;
-        status = VTACH;
-    } else {
-        if (status == VFIB)
-            return;
-        status = HEART_NORMAL;
-    }
-}
-
 /**
  * @brief Returns the status of the heart's pulse
  * 
@@ -70,7 +51,6 @@ void Heart::shock()
 {
     if(status == VTACH){
         setBasePulseTime(1621); // set to around 37bpm, for CPR later
-        setVtach(false);
     }
     else if(status == VFIB){
         setBasePulseTime(1621); // set to around 37bpm, for CPR later
@@ -80,6 +60,15 @@ void Heart::shock()
         return ;
     }
 
+}
+/**
+ * Sets the base pulse time and updates the time for the next pulse
+ * @param newValue
+ */
+void Heart::setBasePulseTime(int newValue)  {
+    if(status == DEAD) return;
+    this->basePulseTime = milliseconds(newValue);
+    nextPulseTime = generatePulseDuration() + lastPulseTime;
 }
 
 /**
@@ -102,34 +91,46 @@ long long Heart::generatePulseDuration() {;
  */
 void Heart::updateState()
 {
-    long long pulseDuration = 0; // override this value in the while loop, the default duration between pulses
     const long long tickRate = 10; // milliseconds
 
     auto lastTick = high_resolution_clock::now();
-    long long totalElapsedTime = 0;
     bool isRegular = false;
-    auto nextPulseTime = 0;
+    long long  pulseDuration = 0;
+    long long totalElapsedTime = 0;
+    long long flatlineTime = 0;
     while (threadActive)
     {
         const auto currentTick = high_resolution_clock::now();
         const auto elapsedTimeSinceLastTick = duration_cast<milliseconds>(currentTick - lastTick).count();
-        totalElapsedTime += duration_cast<milliseconds>(currentTick - lastTick).count();
+        totalElapsedTime += elapsedTimeSinceLastTick;
         lastTick = currentTick;
-        if(pulses.empty()) {
-            heartRate = 0;
+        if(heartRate == 0) {
+            flatlineTime += elapsedTimeSinceLastTick;
+            if(flatlineTime > 60000) {
+                pulses.clear();
+                basePulseTime = milliseconds(0);
+                pulseTimeVariance = milliseconds(0);
+                status = DEAD;
+                threadActive = false;
+                return;
+            }
+        } else {
+            flatlineTime = 0;
         }
+
 
         // Check if it's time for the next pulse
         // compare elapsed time since last pulse to pulse duration
         if (totalElapsedTime >= nextPulseTime)
         {
             // accommodate for thread error
+            lastPulseTime = nextPulseTime;
             totalElapsedTime = nextPulseTime;
             pulseDuration = generatePulseDuration();
             nextPulseTime = pulseDuration + totalElapsedTime;
 
             // Add a new pulse
-            std::cout << "["<< totalElapsedTime << "ms] Created a pulse at: " << totalElapsedTime << "ms, next pulse in " << pulseDuration <<  "ms, at " << nextPulseTime << std::endl;
+//            std::cout << "["<< totalElapsedTime << "ms] Created a pulse at: " << totalElapsedTime << "ms, next pulse in " << pulseDuration <<  "ms, at " << nextPulseTime << ". Current HR: " << heartRate << std::endl;
             pulses.push_back(new Pulse(milliseconds(totalElapsedTime), getCurrentPulseType()));
 
             // Check regularity
@@ -148,31 +149,23 @@ void Heart::updateState()
 //                if(!isRegular)
 //                    std::cout << "Pulse is not regular " << std::endl;
             }
-            else{
-                if(this->getStatus() == VTACH || this->getStatus() == HEART_NORMAL){
-                    isRegular = true;
-
-                    if(this->getStatus() == VTACH){
-                        setVtach(true);
-                    }
-                }
-                else{
-                    isRegular = false;
-                }
-            }
 
             // Calculate heartRate
             if (isRegular) {
                 if(status == VFIB) status = HEART_NORMAL;
                 // Use big-box method to calculate heart rate
                 if(pulses.size() >= 2){
-                    heartRate = 60000 / (pulses[1]->getTime() - pulses[0]->getTime()).count();
+                    heartRate = (int) round(60000.0 / (double) (pulses[1]->getTime() - pulses[0]->getTime()).count());
+                    status = heartRate == 0 ? ASYSTOLE : heartRate > 120 ? VTACH : HEART_NORMAL;
                 } else {
-                    heartRate = 0;
+                    heartRate = (int) round(60000.0 / (double) basePulseTime.count());
+                    status = ASYSTOLE;
                 }
             } else {
-                status = VFIB; // commenting this out makes heartNormalStatusTest to pass but status wrong for heartVfibTest
-                heartRate = getBasePulseTime() < 10000 ? pulses.size()*10 : pulses.size() >= 2 ? 60000 / (pulses[pulses.size()-1]->getTime() - pulses[pulses.size()-2]->getTime()).count() : 0;
+                heartRate = getBasePulseTime() < 10000 ? pulses.size()*10 :
+                        pulses.size() >= 2 ? (int) round(60000.0 / (double) (pulses[1]->getTime() - pulses[0]->getTime()).count()) :
+                        (int) round(60000.0 / (double) basePulseTime.count());
+                status = heartRate == 0 ? ASYSTOLE : VFIB;
             }
         }
 
@@ -200,5 +193,7 @@ void Heart::clearPulses() {
         delete pulses.at(pulses.size() - 1);
         pulses.pop_back();
     }
+    status = ASYSTOLE;
     heartRate = 0;
+    nextPulseTime = 0;
 }

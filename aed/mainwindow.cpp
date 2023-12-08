@@ -75,7 +75,7 @@ void MainWindow::update(AEDStatus status) {
     const QString RED = QString::fromStdString("background-color: rgb(255, 100, 100)");
     const QString GREEN = QString::fromStdString("background-color: rgb(100, 255, 100)");
     const QString GRAY = QString::fromStdString("background-color: rgb(175, 175, 175)");
-    std::vector<QString> displayStrings = { "", "CHANGE BATTERY", "TURNING ON", "TEST FAIL", "UNIT OK", "CHECK RESPONSIVENESS", "CALL HELP", "ATTACH PADS TO PATIENT'S CHEST", "DON'T TOUCH PATIENT, ANALYZING", "SHOCK ADVISED", "SHOCK NOT ADVISED", "START CPR", "PATIENT HEALTHY" };
+    std::vector<QString> displayStrings = { "", "CHANGE BATTERY", "TURNING ON", "TEST FAIL", "UNIT OK", "CHECK RESPONSIVENESS", "CALL HELP", "ATTACH PADS TO PATIENT'S CHEST", "DON'T TOUCH PATIENT, ANALYZING", "SHOCK ADVISED", "START CPR", "PATIENT HEALTHY" };
     std::vector<QFrame*> indicators = { ui->indicator1, ui->indicator2, ui->indicator3, ui->indicator4, ui->indicator5, ui->indicator6 };
     ui->displayLabel->setText(displayStrings.at(status));
 
@@ -131,11 +131,15 @@ void MainWindow::updateDisplay(std::string text) {
  */
 void MainWindow::updateHeartRate() {
     if(aedDevice->isHeartNull()) return;
-    ui->heartRateLabel->setText(aedDevice->getHeartRate() == -1 ? "" : QString::number(aedDevice->getHeartRate()));
+    ui->heartRateLabel->setText(
+            aedDevice->getHeartRate() == -1 ? "" :
+            aedDevice->getHeartStatus() == VFIB ? QString::fromStdString("~"+std::to_string(aedDevice->getHeartRate())) :
+            QString::number(aedDevice->getHeartRate())
+            );
     ui->qrsWidthLabel->setText(QString::number(aedDevice->getBasePulseTime()));
     ui->qrsWidthVarianceLabel->setText(QString::number(aedDevice->getPulseTimeVariance()));
     ui->pulsesCountLabel->setText(QString::number(aedDevice->getPulsesCount()));
-    std::vector<std::string> statuses = { "NORMAL", "VTACH", "VFIB", "ASYSTOLE" };
+    std::vector<std::string> statuses = { "NORMAL", "VTACH", "VFIB", "ASYSTOLE", "DEAD" };
     ui->heartStatusLabel->setText(QString::fromStdString(statuses.at(aedDevice->getHeartStatus())));
     // emit drawEcg(aedDevice->getHeartRate());
 }
@@ -190,7 +194,8 @@ void MainWindow::patientStartingConditionHandler(QString condition) {
         c == "Normal" ? PSC_NORMAL :
         c == "Asystole" ? PSC_ASYSTOLE :
         c == "Sub 40" ? PSC_SUB40 :
-        PSC_HEART_ATTACK);
+        c == "Heart Attack VFIB" ? PSC_HEART_ATTACK_VFIB :
+        PSC_HEART_ATTACK_VTACH);
 }
 
 /**
