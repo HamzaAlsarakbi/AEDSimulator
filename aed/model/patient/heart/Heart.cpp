@@ -1,9 +1,10 @@
 #include <iostream>
 #include "Heart.h"
+
 /**
- * Constructs a Heart object with the following properties
- * - qrsWidth: 1000 milliseconds ~= 60 BPM
- * - qrsWidthVariance: 0 milliseconds
+ * @brief Constructs a Heart object with the following properties
+ * @brief - qrsWidth: 1000 milliseconds ~= 60 BPM
+ * @brief - qrsWidthVariance: 0 milliseconds
  */
 Heart::Heart()
     : threadActive(true), thread(&Heart::updateState, this), status(HEART_NORMAL),
@@ -13,6 +14,11 @@ Heart::Heart()
     std::random_device rd;
     gen = std::default_random_engine(rd());
 }
+
+/**
+ * @brief Destroy the Heart:: Heart object
+ * 
+ */
 Heart::~Heart()
 {
     threadActive = false;
@@ -26,6 +32,11 @@ Heart::~Heart()
     }
 }
 
+/**
+ * @brief Sets the heart status to Vtack if allowed (normal if not)
+ * 
+ * @param vtach (bool) whether the heart condition is Vtack or not 
+ */
 void Heart::setVtach(bool vtach)
 {
     if(vtach) {
@@ -39,6 +50,11 @@ void Heart::setVtach(bool vtach)
     }
 }
 
+/**
+ * @brief Returns the status of the heart's pulse
+ * 
+ * @return PulseType (PulseStatus) The status of the heart pulse
+ */
 PulseType Heart::getCurrentPulseType() {
     return status == HEART_NORMAL ? PULSE_NORMAL :
     status == VTACH ? PULSE_VTACH :
@@ -47,7 +63,8 @@ PulseType Heart::getCurrentPulseType() {
 }
 
 /**
- *  Administers shock
+ * @brief Administers shock
+ * 
  */
 void Heart::shock()
 {
@@ -64,12 +81,25 @@ void Heart::shock()
     }
 
 }
+
+/**
+ * @brief Creates the duration between one pulse to another
+ * 
+ * @return long long The Duration of the pulse
+ */
 long long Heart::generatePulseDuration() {;
     long long positive = (distribution(gen)%2)*2-1;
     long long variance = pulseTimeVariance.count() == 0 ? 0 :
                          distribution(gen) % (pulseTimeVariance.count()+1) * positive;
     return basePulseTime.count() + variance;
 }
+
+/**
+ * @brief Function on a thread that constantly updates the state of the heart
+ * @brief - It checks the regularity of the heart beat
+ * @brief - It calculates the heart rate from pulse information
+ * 
+ */
 void Heart::updateState()
 {
     long long pulseDuration = 0; // override this value in the while loop, the default duration between pulses
@@ -161,6 +191,10 @@ void Heart::updateState()
     }
 }
 
+/**
+ * @brief Resets the pulse and heart rate data
+ * 
+ */
 void Heart::clearPulses() {
     while(!pulses.empty()) {
         delete pulses.at(pulses.size() - 1);
