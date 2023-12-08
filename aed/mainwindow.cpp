@@ -41,7 +41,7 @@ MainWindow::~MainWindow()
 }
 
 /**
- * @brief Connects teh buttons on the ui to signals that emit to do the actual functions
+ * @brief Connects the buttons on the ui to signals that emit to do the actual functions
  * 
  */
 void MainWindow::connectUI() {
@@ -55,7 +55,7 @@ void MainWindow::connectUI() {
 
     // Buttons
     connect(ui->turnOnButton, &QPushButton::pressed, this, &MainWindow::turnOnHandler);
-    connect(ui->turnOffButton, SIGNAL(pressed()), aedDevice, SLOT(handleTurnOff()));
+    connect(ui->turnOffButton, SIGNAL(pressed()), aedDevice, SLOT(turnOffHandler()));
     connect(ui->attachDefibPadsCorrectlyButton, &QPushButton::pressed, this, &MainWindow::padsCorrectHandler);
     connect(ui->attachDefibPadsIncorrectlyButton, &QPushButton::pressed, this, &MainWindow::padsIncorrectHandler);
     connect(ui->failTestButton, &QPushButton::pressed, this, &MainWindow::failTestHandler);
@@ -63,7 +63,7 @@ void MainWindow::connectUI() {
     connect(ui->cprButton, &QPushButton::pressed, this, &MainWindow::cprHandler);
     connect(aedDevice, SIGNAL(update(AEDStatus)), this, SLOT(update(AEDStatus)));
     connect(aedDevice, SIGNAL(updateDisplay(std::string)), this, SLOT(updateDisplay(std::string)));
-    connect(aedDevice, SIGNAL(initUpdateHeartRate()), this, SLOT(updateHeartRate()));
+    connect(aedDevice, SIGNAL(updateUiHeartRate()), this, SLOT(updateHeartRate()));
 }
 
 /**
@@ -84,10 +84,12 @@ void MainWindow::update(AEDStatus status) {
     ui->turnOffButton->setDisabled(status < 2);
     ui->failTestButton->setDisabled(status != AED_ON && status != AED_OFF);
 //    AED Screen
-    ui->heartRateLabel->setVisible(status > 8);
-    ui->batteryLabel->setText(status < 2 ? "" : QString::fromStdString(std::to_string(aedDevice->getBattery()) + "%"));
-    ui->shocksCount->setText(status < 2 ? "" : QString::number(aedDevice->getShocksCount()));
-    // ecgWidget->setVisible(status > 8);
+    ui->heartRateLabel->setVisible(status > 7);
+    ui->batteryLabel->setVisible(status < 2);
+    ui->batteryLabel->setText(QString::fromStdString(std::to_string(aedDevice->getBattery()) + "%"));
+    ui->shocksCount->setVisible(status < 2);
+    ui->shocksCount->setText(QString::number(aedDevice->getShocksCount()));
+    // ecgWidget->setVisible(status > 7);
 //    AED Lights
     ui->testPassIndicator->setStyleSheet(status == AED_OFF || status == AED_ON ? GRAY : aedDevice->isPassing() ? GREEN : RED);
     for(int i = 0; i < indicators.size(); i++) {
@@ -203,7 +205,7 @@ void MainWindow::patientStartingConditionHandler(QString condition) {
  * 
  */
 void MainWindow::turnOnHandler(){
-    emit aedDevice->initTurnOn();
+    emit aedDevice->turnOnHandler();
 }
 
 /**

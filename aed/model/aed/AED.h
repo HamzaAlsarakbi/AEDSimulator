@@ -58,6 +58,20 @@ public:
     void cpr(double depth);
     void administerShock();
     void resetPatient(PatientSCondition condition);
+    void turnOnHandler();
+    void selfTestHandler();
+    void checkBatteryHandler();
+    void checkResponsivenessHandler();
+    void callHelpHandler();
+    void attachPadsHandler();
+    void checkConnectionHandler();
+    void beforeDontTouchPatient();
+    void dontTouchPatientHandler();
+    void startCprHandler();
+    void shockAdvisedHandler();
+    void patientHealthyHandler();
+    void administerShockHandler();
+    void updateHeartRateHandler();
 
 private:
     QThread thread;
@@ -70,41 +84,14 @@ private:
     void addLoadOnBattery(int load);
 
 public slots:
-    void handleTurnOn();
-    void handleTurnOff();
-    void handleSelfTest();
-    void handleChangeBattery();
-    void handleCheckResponsiveness();
-    void handleCallHelp();
-    void handleAttachPads();
-    void handleCheckConnection();
-    void handleTypeOfPads();
-    void handleDontTouchPatient();
-    void handleStartCpr();
-    void handleShockAdvised();
-    void handlePatientHealthy();
-    void handleShock();
-    void handleUpdateHeartRate();
+    void handle(WaitFor);
+    void turnOffHandler();
 
 signals:
-    void initTurnOn();
-    void initSelfTest();
-    void initChangeBattery();
-    void initCheckResponsiveness();
-    void initCallHelp();
-    void initAttachPads();
-    void initCheckConnection();
-    void initTypeOfPads();
-    void initDontTouchPatient();
-    void initStartCpr();
-    void initShockAdvised();
-    void initShockNotAdvised();
-    void initPatientHealthy();
-    void initUpdateHeartRate();
+    void wait(WaitFor);
     void update(AEDStatus state);
     void updateDisplay(std::string text);
-
-    void initShock();
+    void updateUiHeartRate();
 
 };
 
