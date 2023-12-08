@@ -16,6 +16,7 @@ patient(new Patient(PSC_NORMAL))
     connect(this, SIGNAL(wait(WaitFor)), worker,SLOT(wait(WaitFor)));
     connect(worker, SIGNAL(ready(WaitFor)), this, SLOT(handle(WaitFor)));
     emit wait(WF_UPDATE_HEART_RATE);
+    emit wait(WF_CHECK_BATTERY);
 }
 
 /**
@@ -73,12 +74,15 @@ void AED::selfTestHandler() {
 void AED::checkBatteryHandler() {
     if (battery <= 0) {
         status = CHANGE_BATTERY;
-        emit wait(WF_CHECK_BATTERY);
+        emit update(status);
+    } else if (battery <= 10) {
+        emit updateDisplay("BATTERY LOW");
     } else {
         if(status == CHANGE_BATTERY)
             status = AED_OFF;
+        emit update(status);
     }
-    emit update(status);
+    emit wait(WF_CHECK_BATTERY);
 }
 
 /**
@@ -86,7 +90,6 @@ void AED::checkBatteryHandler() {
  * 
  */
 void AED::turnOffHandler() {
-    emit updateDisplay("TURNING OFF");
     status = AED_OFF;
     connection = NONE;
     shocks = 0;
@@ -257,7 +260,6 @@ void AED::administerShockHandler() {
     if(status != SHOCK_ADVISED) return;
     if(battery <= 10) {
         emit updateDisplay("NOT ENOUGH BATTERY FOR SHOCK");
-        checkBatteryHandler();
         return;
     }
     addLoadOnBattery(10);
@@ -309,7 +311,6 @@ void AED::handle(WaitFor waitFor) {
  */
 void AED::addLoadOnBattery(int load) {
     battery -= load;
-    checkBatteryHandler();
 }
 
 /**
