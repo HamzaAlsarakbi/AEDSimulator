@@ -4,3 +4,6 @@
 build-aed-Desktop-Debug/
 
 .DS_Store
+
+~$*
+*.bkp
