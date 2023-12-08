@@ -43,6 +43,9 @@ public slots:
                 waitFor == WF_DONT_TOUCH_PATIENT ? dontTouchPatientDuration :
                 stepDuration;
         unsigned long duration = 0;
+        if(waitFor >= WF_ADMINISTER_SHOCK) {
+            std::cout << "waiting " << totalDuration << " for " << waitFor << std::endl;
+        }
         while (!abort && duration < totalDuration) {
             QThread::msleep(tickDuration);
             duration += tickDuration;

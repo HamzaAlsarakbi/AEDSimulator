@@ -1470,7 +1470,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Pulses in the last 6/60 seconds:</string>
+               <string>Pulses in the last 6 seconds:</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

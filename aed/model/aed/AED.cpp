@@ -1,8 +1,8 @@
 #include "AED.h"
-
+#include <QRandomGenerator>
 /**
  * @brief Construct a new AED::AED object
- * 
+ *
  */
 AED::AED()
 : battery(100), status(AED_OFF), connection(NONE), shocks(0),
@@ -21,7 +21,7 @@ patient(new Patient(PSC_NORMAL))
 
 /**
  * @brief Destroy the AED::AED object
- * 
+ *
  */
 AED::~AED(){
     workerThread.exit();
@@ -41,7 +41,7 @@ void AED::setPadPlacement(ConnectionStatus connection) {
 
 /**
  * @brief Turns on, then calls for self test
- * 
+ *
  */
 void AED::turnOnHandler() {
     if(battery <= 0) return;
@@ -53,7 +53,7 @@ void AED::turnOnHandler() {
 
 /**
  * @brief Operates self test, then calls to check responsiveness of patient
- * 
+ *
  */
 void AED::selfTestHandler() {
     if(status < 2) return;
@@ -69,7 +69,7 @@ void AED::selfTestHandler() {
 
 /**
  * @brief Checks for the battery. replays until battery is not 0
- * 
+ *
  */
 void AED::checkBatteryHandler() {
     if (battery <= 0) {
@@ -78,16 +78,17 @@ void AED::checkBatteryHandler() {
     } else if (battery <= 10) {
         emit updateDisplay("BATTERY LOW");
     } else {
-        if(status == CHANGE_BATTERY)
+        if(status == CHANGE_BATTERY) {
             status = AED_OFF;
-        emit update(status);
+            emit update(status);
+        }
     }
     emit wait(WF_CHECK_BATTERY);
 }
 
 /**
  * @brief Turns off device
- * 
+ *
  */
 void AED::turnOffHandler() {
     status = AED_OFF;
@@ -98,7 +99,7 @@ void AED::turnOffHandler() {
 
 /**
  * @brief Asks the user to check responsiveness of the patient
- * 
+ *
  */
 void AED::checkResponsivenessHandler() {
     if(status < 4) return;
@@ -109,7 +110,7 @@ void AED::checkResponsivenessHandler() {
 
 /**
  * @brief Asks the user to call for help
- * 
+ *
  */
 void AED::callHelpHandler() {
     if(status < 5) return;
@@ -120,7 +121,7 @@ void AED::callHelpHandler() {
 
 /**
  * @brief Checks the quality of connection. if good quality, move on
- * 
+ *
  */
 void AED::attachPadsHandler() {
     if(status < 6) return;
@@ -134,21 +135,24 @@ void AED::attachPadsHandler() {
 
 /**
  * @brief Checks the connection of the pads onto the patient
- * 
+ *
  */
 void AED::checkConnectionHandler() {
     if(status != ATTACH_PADS) return;
     if (connection == GOOD) {
         addLoadOnBattery(1);
+        update(status);
         emit updateDisplay(patient->getAge() < 8 ? "CHILD PADZ" : "ADULT PADZ");
         emit wait(WF_BEFORE_DONT_TOUCH_PATIENT);
     } else if(connection == BAD) {
+        update(status);
         emit updateDisplay("CHECK CONNECTION");
         emit wait(WF_CHECK_CONNECTION);
     } else {
         emit wait(WF_CHECK_CONNECTION);
     }
 }
+
 /**
  * @brief Checks the connection of the pads onto the patient
  *
@@ -158,12 +162,12 @@ void AED::beforeDontTouchPatient() {
     update(status);
     emit wait(WF_DONT_TOUCH_PATIENT);
 }
+
 /**
  * @brief Asks user not to shock patient while analyzing
- * 
+ *
  */
 void AED::dontTouchPatientHandler() {
-    std::cout << "dontTouchPatientHandler " << status << std::endl;
     if(status < 7) return;
     addLoadOnBattery(4);
     status = DONT_TOUCH_PATIENT;
@@ -182,20 +186,8 @@ void AED::dontTouchPatientHandler() {
 }
 
 /**
- * @brief Asks the user to start CPR
- * 
- */
-void AED::startCprHandler() {
-    if(status < 8) return;
-    if(status != START_CPR) {
-        status = START_CPR;
-        emit update(status);
-    }
-}
-
-/**
  * @brief Advises the user to use the defibrillator on the patient
- * 
+ *
  */
 void AED::shockAdvisedHandler() {
     if(status < 8) return;
@@ -206,23 +198,46 @@ void AED::shockAdvisedHandler() {
 }
 
 /**
- * @brief Alerts user of the patient's health and stop operation
- * 
- */
-void AED::patientHealthyHandler() {
-    if(status < 8) return;
-    status = AED_PATIENT_HEALTHY;
-    emit update(status);
-}
-
-/**
  * @brief Gives warning for shock
- * 
+ *
  */
 void AED::administerShock() {
     if(status != SHOCK_ADVISED) return;
     updateDisplay("ADMINISTERING SHOCK IN 3...2...1");
     emit wait(WF_ADMINISTER_SHOCK);
+}
+/**
+ * @brief Administers a shock
+ *
+ */
+void AED::administerShockHandler() {
+    if(status != SHOCK_ADVISED) return;
+    if(battery <= 10) {
+        emit updateDisplay("NOT ENOUGH BATTERY FOR SHOCK");
+        return;
+    }
+    addLoadOnBattery(10);
+    // determine if it's a valid shock, with the following percentages of success [25%, 33%, 50%, 100%]
+    if(shocks > 3 || QRandomGenerator::global()->bounded((int) 4-shocks) == 0) {
+        patient->shock();
+    }
+    shocks++;
+    status = DONT_TOUCH_PATIENT;
+    emit update(status);
+    emit updateDisplay("SHOCK ADMINISTERED, ANALYZING PATIENT");
+    emit wait(WF_BEFORE_DONT_TOUCH_PATIENT);
+}
+
+/**
+ * @brief Asks the user to start CPR
+ *
+ */
+void AED::startCprHandler() {
+    if(status < 8) return;
+    if(status != START_CPR) {
+        status = START_CPR;
+        emit update(status);
+    }
 }
 
 /**
@@ -244,6 +259,16 @@ void AED::cpr(double depth) {
 }
 
 /**
+ * @brief Alerts user of the patient's health and stop operation
+ *
+ */
+void AED::patientHealthyHandler() {
+    if(status < 8) return;
+    status = AED_PATIENT_HEALTHY;
+    emit update(status);
+}
+
+/**
  * @brief Changes the display of the ECG
  *
  */
@@ -253,22 +278,9 @@ void AED::updateHeartRateHandler() {
 }
 
 /**
- * @brief Administers a shock
- *
+ * Base Handler for wait events, routes them by the waitFor parameter
+ * @param waitFor what was the AEDWorker waiting for
  */
-void AED::administerShockHandler() {
-    if(status != SHOCK_ADVISED) return;
-    if(battery <= 10) {
-        emit updateDisplay("NOT ENOUGH BATTERY FOR SHOCK");
-        return;
-    }
-    addLoadOnBattery(10);
-    shocks++;
-    patient->shock();
-    emit updateDisplay("SHOCK ADMINISTERED, ANALYZING PATIENT");
-    beforeDontTouchPatient();
-}
-
 void AED::handle(WaitFor waitFor) {
     switch (waitFor) {
         case WF_SELF_TEST:

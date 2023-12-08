@@ -72,6 +72,7 @@ void MainWindow::connectUI() {
  * @param status (AEDStatus) The current state the AED is in
  */
 void MainWindow::update(AEDStatus status) {
+    std::cout << "redrawing: " << status << std::endl;
     const QString RED = QString::fromStdString("background-color: rgb(255, 100, 100)");
     const QString GREEN = QString::fromStdString("background-color: rgb(100, 255, 100)");
     const QString GRAY = QString::fromStdString("background-color: rgb(175, 175, 175)");
@@ -85,9 +86,9 @@ void MainWindow::update(AEDStatus status) {
     ui->failTestButton->setDisabled(status != AED_ON && status != AED_OFF);
 //    AED Screen
     ui->heartRateLabel->setVisible(status > 7);
-    ui->batteryLabel->setVisible(status < 2);
+    ui->batteryLabel->setVisible(status > 1);
     ui->batteryLabel->setText(QString::fromStdString(std::to_string(aedDevice->getBattery()) + "%"));
-    ui->shocksCount->setVisible(status < 2);
+    ui->shocksCount->setVisible(status > 1);
     ui->shocksCount->setText(QString::number(aedDevice->getShocksCount()));
     // ecgWidget->setVisible(status > 7);
 //    AED Lights
