@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include "model/aed/AED.h"
-#include "ui/EcgWidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -38,7 +37,6 @@ signals:
    void drawEcg(std::vector<Pulse> pulses);
 
 private:
-    EcgWidget* ecgWidget;
     Ui::MainWindow *ui;
     AED* aedDevice;
     void connectUI();

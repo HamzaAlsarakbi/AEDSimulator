@@ -50,8 +50,6 @@ add_executable(aed
     model/patient/Patient.h
     model/aed/AED.cpp
         model/patient/Patient.cpp
-        ui/EcgWidget.h
-        ui/EcgWidget.cpp
         model/aed/AEDWorker.h)
 
 # Link pulse and heart libraries with the executable

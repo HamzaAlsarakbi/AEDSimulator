@@ -14,8 +14,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     aedDevice = new AED();
-    ecgWidget = new EcgWidget(ui->ecgGraphWidget);
-    ui->ecgGraphWidget->layout()->addWidget(ecgWidget);
     connectUI();
     update(aedDevice->getStatus());
     ui->depthSlider->setDisabled(true);
@@ -35,7 +33,6 @@ MainWindow::MainWindow(QWidget *parent)
  */
 MainWindow::~MainWindow()
 {
-    delete ecgWidget;
     delete ui;
     delete aedDevice;
 }
@@ -51,7 +48,6 @@ void MainWindow::connectUI() {
     connect(ui->baseDepthVarianceSlider, &QSlider::valueChanged, this, &MainWindow::baseDepthVarianceSliderHandler);
     connect(ui->ageSlider, &QSlider::valueChanged, this, &MainWindow::ageSliderHandler);
     connect(ui->startingConditionBox, SIGNAL(currentTextChanged(QString)), this, SLOT(patientStartingConditionHandler(QString)));
-    connect(this, SIGNAL(drawEcg(std::vector<Pulse>)), ecgWidget, SLOT(draw(std::vector<Pulse>)));
 
     // Buttons
     connect(ui->turnOnButton, &QPushButton::pressed, this, &MainWindow::turnOnHandler);
@@ -85,6 +81,7 @@ void MainWindow::update(AEDStatus status) {
     ui->turnOffButton->setDisabled(status < 2);
     ui->failTestButton->setDisabled(status != AED_ON && status != AED_OFF);
 //    AED Screen
+    ui->ecgGraphsWidgetOmmak->setVisible(status > 7);
     ui->heartRateLabel->setVisible(status > 7);
     ui->batteryLabel->setVisible(status > 1);
     ui->batteryLabel->setText(QString::fromStdString(std::to_string(aedDevice->getBattery()) + "%"));
@@ -144,7 +141,10 @@ void MainWindow::updateHeartRate() {
     ui->pulsesCountLabel->setText(QString::number(aedDevice->getPulsesCount()));
     std::vector<std::string> statuses = { "Dead", "Asystole", "Pulse-less Electrical Activity", "Arrythmic", "Normal", "Ventricular Tachycardia", "Ventricular Fibrillation" };
     ui->heartStatusLabel->setText(QString::fromStdString(statuses.at(aedDevice->getHeartStatus())));
-    // emit drawEcg(aedDevice->getHeartRate());
+    std::vector<QLabel*> graphs = { ui->ecgDeadGraph, ui->ecgAsystoleGraph, ui->ecgPeaGraph, ui->ecgArrythmiaGraph, ui->ecgNormalGraph, ui->ecgVtachGraph, ui->ecgVfibGraph };
+    for(int i = 0; i < graphs.size(); i++) {
+        graphs[i]->setVisible(aedDevice->getHeartStatus() == i);
+    }
 }
 
 /**

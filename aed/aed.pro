@@ -14,8 +14,7 @@ SOURCES += \
     model/aed/AED.cpp \
     model/patient/Patient.cpp \
     model/patient/heart/Heart.cpp \
-    model/patient/heart/pulse/Pulse.cpp \
-    ui/EcgWidget.cpp
+    model/patient/heart/pulse/Pulse.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -23,8 +22,7 @@ HEADERS += \
     model/aed/AEDWorker.h \
     model/patient/Patient.h \
     model/patient/heart/Heart.h \
-    model/patient/heart/pulse/Pulse.h \
-    ui/EcgWidget.h
+    model/patient/heart/pulse/Pulse.h
 
 FORMS += \
     mainwindow.ui
@@ -37,3 +35,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     img.qrc
+
+DISTFILES += \
+    img/ecg/ecg-vfib.png
