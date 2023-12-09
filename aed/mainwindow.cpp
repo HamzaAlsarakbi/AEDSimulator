@@ -54,6 +54,7 @@ void MainWindow::connectUI() {
     connect(ui->turnOffButton, SIGNAL(pressed()), aedDevice, SLOT(turnOffHandler()));
     connect(ui->attachDefibPadsCorrectlyButton, &QPushButton::pressed, this, &MainWindow::padsCorrectHandler);
     connect(ui->attachDefibPadsIncorrectlyButton, &QPushButton::pressed, this, &MainWindow::padsIncorrectHandler);
+    connect(ui->disconnectDefibPadsButton, &QPushButton::pressed, this, &MainWindow::disconnectPadsHandler);
     connect(ui->failTestButton, &QPushButton::pressed, this, &MainWindow::failTestHandler);
     connect(ui->administerShockButton, &QPushButton::pressed, this, &MainWindow::administerShockHandler);
     connect(ui->cprButton, &QPushButton::pressed, this, &MainWindow::cprHandler);
@@ -81,8 +82,8 @@ void MainWindow::update(AEDStatus status) {
     ui->turnOffButton->setDisabled(status < 2);
     ui->failTestButton->setDisabled(status != AED_ON && status != AED_OFF);
 //    AED Screen
-    ui->ecgGraphsWidgetOmmak->setVisible(status > 7);
-    ui->heartRateLabel->setVisible(status > 7);
+    ui->ecgGraphsWidgetOmmak->setVisible(status > 8);
+    ui->heartRateLabel->setVisible(status > 8);
     ui->batteryLabel->setVisible(status > 1);
     ui->batteryLabel->setText(QString::fromStdString(std::to_string(aedDevice->getBattery()) + "%"));
     ui->shocksCount->setVisible(status > 1);
@@ -101,14 +102,15 @@ void MainWindow::update(AEDStatus status) {
     ui->changeBatteriesButton->setVisible(false);
     ui->attachDefibPadsCorrectlyButton->setVisible(status == ATTACH_PADS && aedDevice->getConnectionStatus() != GOOD);
     ui->attachDefibPadsIncorrectlyButton->setVisible(status == ATTACH_PADS && aedDevice->getConnectionStatus() == NONE);
+    ui->disconnectDefibPadsButton->setVisible(status > ATTACH_PADS && aedDevice->getConnectionStatus() == GOOD);
     ui->administerShockButton->setVisible(status > 8);
     ui->administerShockButton->setDisabled(status != SHOCK_ADVISED);
     ui->cprButton->setVisible(status > 8);
     ui->cprButton->setDisabled(status != START_CPR);
 
 //    Patient Controls
-    ui->ageWidget->setDisabled(status > 8);
-    ui->startingConditionWidget->setDisabled(status > 1);
+    ui->ageWidget->setDisabled(status > 7);
+    ui->startingConditionWidget->setDisabled(status > 7);
     ui->qrsWidthWidget->setVisible(status > 8);
     ui->qrsWidthVarianceWidget->setVisible(status > 8);
     ui->vtachWidget->setVisible(status > 8);
@@ -223,6 +225,13 @@ void MainWindow::padsCorrectHandler(){
  */
 void MainWindow::padsIncorrectHandler(){
     aedDevice->setPadPlacement(BAD);
+}
+
+/**
+ * @brief Disconnects the pads from the patient
+ */
+void MainWindow::disconnectPadsHandler() {
+    aedDevice->setPadPlacement(NONE);
 }
 
 /**

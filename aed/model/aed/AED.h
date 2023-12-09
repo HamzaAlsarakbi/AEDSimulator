@@ -74,7 +74,7 @@ public:
     void updateHeartRateHandler();
 
 private:
-    QThread thread;
+    AEDWorker* aedWorker;
     AEDStatus status;
     int battery;
     int shocks;

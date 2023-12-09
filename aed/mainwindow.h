@@ -26,6 +26,7 @@ public slots:
     void turnOnHandler();
     void padsCorrectHandler();
     void padsIncorrectHandler();
+    void disconnectPadsHandler();
     void administerShockHandler();
     void cprHandler();
     void failTestHandler();
