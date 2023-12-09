@@ -6,5 +6,12 @@
         <file>img/dontTouchPatient.png</file>
         <file>img/heart.png</file>
         <file>img/startCpr.png</file>
+        <file>img/ecg/ecg-arrythmia.png</file>
+        <file>img/ecg/ecg-dead.png</file>
+        <file>img/ecg/ecg-pea.png</file>
+        <file>img/ecg/ecg-vtach.png</file>
+        <file>img/ecg/ecg-asystole.png</file>
+        <file>img/ecg/ecg-normal.png</file>
+        <file>img/ecg/ecg-vfib.png</file>
     </qresource>
 </RCC>
