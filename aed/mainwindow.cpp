@@ -142,7 +142,7 @@ void MainWindow::updateHeartRate() {
     ui->qrsWidthLabel->setText(QString::number(aedDevice->getBasePulseTime()));
     ui->qrsWidthVarianceLabel->setText(QString::number(aedDevice->getPulseTimeVariance()));
     ui->pulsesCountLabel->setText(QString::number(aedDevice->getPulsesCount()));
-    std::vector<std::string> statuses = { "NORMAL", "VTACH", "VFIB", "ASYSTOLE", "DEAD" };
+    std::vector<std::string> statuses = { "Dead", "Asystole", "Pulse-less Electrical Activity", "Arrythmic", "Normal", "Ventricular Tachycardia", "Ventricular Fibrillation" };
     ui->heartStatusLabel->setText(QString::fromStdString(statuses.at(aedDevice->getHeartStatus())));
     // emit drawEcg(aedDevice->getHeartRate());
 }

@@ -39,7 +39,8 @@ Heart::~Heart()
 PulseType Heart::getCurrentPulseType() {
     return status == HEART_NORMAL ? PULSE_NORMAL :
     status == VTACH ? PULSE_VTACH :
-    status == VFIB ? PULSE_VFIB : 
+    status == VFIB ? PULSE_VFIB :
+    status == ARRHYTHMIC ? PULSE_VFIB :
     PULSE_ASYSTOLE;
 }
 
@@ -49,17 +50,9 @@ PulseType Heart::getCurrentPulseType() {
  */
 void Heart::shock()
 {
-    if(status == VTACH){
-        setBasePulseTime(1621); // set to around 37bpm, for CPR later
-    }
-    else if(status == VFIB){
-        setBasePulseTime(1621); // set to around 37bpm, for CPR later
-        setPulseTimeVariance(0); // set to regular rhythm
-    }
-    else{
-        return ;
-    }
-
+    if(status != VTACH && status !=  VFIB) return;
+    setBasePulseTime(1621); // set to around 37bpm, for CPR later
+    setPulseTimeVariance(0); // set to regular rhythm
 }
 /**
  * Sets the base pulse time and updates the time for the next pulse
@@ -156,16 +149,16 @@ void Heart::updateState()
                 // Use big-box method to calculate heart rate
                 if(pulses.size() >= 2){
                     heartRate = (int) round(60000.0 / (double) (pulses[1]->getTime() - pulses[0]->getTime()).count());
-                    status = heartRate == 0 ? ASYSTOLE : heartRate > 120 ? VTACH : HEART_NORMAL;
+                    status = heartRate == 0 ? ASYSTOLE : heartRate > 120 ? VTACH : heartRate <= 40 ? PEA : HEART_NORMAL;
                 } else {
                     heartRate = (int) round(60000.0 / (double) basePulseTime.count());
-                    status = ASYSTOLE;
+                    status = heartRate == 0 ? ASYSTOLE : PEA;
                 }
             } else {
                 heartRate = getBasePulseTime() < 10000 ? pulses.size()*10 :
                         pulses.size() >= 2 ? (int) round(60000.0 / (double) (pulses[1]->getTime() - pulses[0]->getTime()).count()) :
                         (int) round(60000.0 / (double) basePulseTime.count());
-                status = heartRate == 0 ? ASYSTOLE : VFIB;
+                status = heartRate == 0 ? ASYSTOLE : heartRate <= 40 ? PEA : heartRate > 120 ? VFIB : ARRHYTHMIC;
             }
         }
 

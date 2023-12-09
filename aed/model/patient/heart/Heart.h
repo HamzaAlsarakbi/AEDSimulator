@@ -10,11 +10,13 @@ using namespace std::chrono;
 
 enum HeartStatus
 {
+    DEAD,
+    ASYSTOLE,
+    PEA,
+    ARRHYTHMIC,
     HEART_NORMAL,
     VTACH,
-    VFIB,
-    ASYSTOLE,
-    DEAD
+    VFIB
 };
 
 class Heart
