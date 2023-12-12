@@ -15,29 +15,29 @@ TEST(PulseTest, normal) {
 // is vtach test
 TEST(PulseTest, vTach) {
     // Setup test data
-    Pulse pulseObject(milliseconds(0), true);
+    Pulse pulseObject(milliseconds(0), PULSE_VTACH);
 
     // Check the results
-    ASSERT_EQ(pulseObject.isVtach(), true);
+    ASSERT_EQ(pulseObject.getType(), PULSE_VTACH);
     ASSERT_EQ(pulseObject.getTime(), milliseconds(0));
 }
 
 // is vfib test
-TEST(PulseTest, vTach) {
+TEST(PulseTest, vFib) {
     // Setup test data
-    Pulse pulseObject(milliseconds(0), true);
+    Pulse pulseObject(milliseconds(0), PULSE_VFIB);
 
     // Check the results
-    ASSERT_EQ(pulseObject.isVtach(), true);
+    ASSERT_EQ(pulseObject.getType(), PULSE_VFIB);
     ASSERT_EQ(pulseObject.getTime(), milliseconds(0));
 }
 
 // is asystole test
-TEST(PulseTest, vTach) {
+TEST(PulseTest, asystole) {
     // Setup test data
-    Pulse pulseObject(milliseconds(0), true);
+    Pulse pulseObject(milliseconds(0), PULSE_ASYSTOLE);
 
     // Check the results
-    ASSERT_EQ(pulseObject.isVtach(), true);
+    ASSERT_EQ(pulseObject.getType(), PULSE_ASYSTOLE);
     ASSERT_EQ(pulseObject.getTime(), milliseconds(0));
 }
