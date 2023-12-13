@@ -55,8 +55,8 @@ Submission:								*Note: some files were omitted from this breakdown as they're
 				sequence diagrams			// Contains 4 safety scenarios and 3 success scenarios in sequence diagrams
 				state diagrams				// Contains state diagrams for the heart and AED
 				tracability matrix			// Contains the tracability matrix for the device
+				videos					// Directory containing videos testing the program and patient classes
 			Other Documentation				// Contains supplemental notes and diagrams made to help with our understanding and making of the project
-
-		test video						// A video testing and presenting our program's functions
+			
 
 		README							// A guide to the contents of the submission
