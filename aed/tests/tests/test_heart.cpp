@@ -48,26 +48,31 @@ TEST(HeartTest, heartNormalStatusTest120) {
 TEST(HeartTest, heartVfibStatusTest) {
     Heart heart;
 
+    heart.setBasePulseTime(290);
     heart.setPulseTimeVariance(200);
 
     // Let the heart update for a while (aka put the test thread to sleep)
     std::cout << "waiting for pulses" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(6050));
 
-    ASSERT_EQ(heart.getStatus(), VFIB);  // Expected status after running for a while
+    std::cout << "vfib heart rate: " << heart.getHeartRate() << std::endl;
+
     std::cout << heart.getHeartRate() << std::endl; // Assert heart rate is positive or as expected
+    ASSERT_EQ(heart.getStatus(), VFIB);  // Expected status after running for a while
+    ASSERT_GT(heart.getHeartRate(), 120); // Assert heart rate is positive or as expected
 }
 
 TEST(HeartTest, heartVtachStatusTest) {
     Heart heart;
 
-    heart.setBasePulseTime(500);
-    heart.(true);
+    heart.setBasePulseTime(490);
+    heart.setPulseTimeVariance(0);
 
     // Let the heart update for a while (aka put the test thread to sleep)
     std::cout << "waiting for pulses" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(6050));
 
+    std::cout << "vtach heart rate: " << heart.getHeartRate() << std::endl;
     ASSERT_EQ(heart.getStatus(), VTACH);  // Expected status after running for a while
-    ASSERT_EQ(heart.getHeartRate(), 120); // Assert heart rate is positive or as expected
+    ASSERT_GT(heart.getHeartRate(), 120); // Assert heart rate is positive or as expected
 }

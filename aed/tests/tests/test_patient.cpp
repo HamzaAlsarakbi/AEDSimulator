@@ -18,7 +18,7 @@ protected:
 };
 
 TEST_F(PatientTest, Shockable_VTACH_HighHeartRate) {
-    SetHeartCondition(PSC_HEART_ATTACK, VTACH, 400, 0); // 150bpm
+    SetHeartCondition(PSC_HEART_ATTACK_VTACH, VTACH, 400, 0); // 150bpm
     std::this_thread::sleep_for(std::chrono::milliseconds (6050));
     ASSERT_TRUE(patient.shockable());
 }
@@ -27,7 +27,7 @@ TEST_F(PatientTest, Shockable_VTACH_HighHeartRate) {
 TEST_F(PatientTest, Shockable_VFIB_HighHeartRate) {
     // heartRate varies too much. but an estimated heartRate
     // defined in the system is important for identifying VFIB
-    SetHeartCondition(PSC_HEART_ATTACK, VFIB, 400, 20); // 140 BPM
+    SetHeartCondition(PSC_HEART_ATTACK_VFIB, VFIB, 400, 20); // 140 BPM
 
     std::this_thread::sleep_for(std::chrono::milliseconds (6050));
     ASSERT_TRUE(patient.getHeartRate() > 120);
@@ -58,6 +58,6 @@ TEST_F(PatientTest, NotShockable_Normal_LowHeartRate) {
 TEST_F(PatientTest, cpr_Normal_LowHeartRate) {
     SetHeartCondition(PSC_SUB40, HEART_NORMAL, 1539, 0); // 39bpm
     std::this_thread::sleep_for(std::chrono::milliseconds (6050));
-    ASSERT_TRUE(patient.cpr(220));
+    ASSERT_EQ(patient.cpr(220), COMP_GOOD);
     ASSERT_TRUE(patient.getHeart()->getBasePulseTime() < 1539);
 }

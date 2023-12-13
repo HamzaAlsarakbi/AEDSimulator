@@ -9,12 +9,12 @@ AED::AED()
 patient(new Patient(PSC_NORMAL))
 {
     qRegisterMetaType<WaitFor>("WaitFor");
-    AEDWorker* worker = new AEDWorker;
-    worker->moveToThread(&workerThread);
+    aedWorker = new AEDWorker();
+    aedWorker->moveToThread(&workerThread);
     workerThread.start();
-    connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
-    connect(this, SIGNAL(wait(WaitFor)), worker,SLOT(wait(WaitFor)));
-    connect(worker, SIGNAL(ready(WaitFor)), this, SLOT(handle(WaitFor)));
+    connect(&workerThread, &QThread::finished, aedWorker, &QObject::deleteLater);
+    connect(this, SIGNAL(wait(WaitFor)), aedWorker,SLOT(wait(WaitFor)));
+    connect(aedWorker, SIGNAL(ready(WaitFor)), this, SLOT(handle(WaitFor)));
     emit wait(WF_UPDATE_HEART_RATE);
     emit wait(WF_CHECK_BATTERY);
 }
@@ -24,7 +24,9 @@ patient(new Patient(PSC_NORMAL))
  *
  */
 AED::~AED(){
+    aedWorker->abort = true;
     workerThread.exit();
+    delete aedWorker;
     delete patient;
     workerThread.wait();
 }
@@ -35,8 +37,13 @@ AED::~AED(){
  * @param connection (ConnectionStatus) The quality of the connection to the patient
  */
 void AED::setPadPlacement(ConnectionStatus connection) {
-    if(status == AED_OFF) return;
     this->connection = connection;
+    if(connection != NONE || status == AED_OFF) return;
+    aedWorker->abort = true;
+    std::this_thread::sleep_for(milliseconds(11));
+    aedWorker->abort = false;
+    emit wait(WF_CHECK_CONNECTION);
+    emit wait(WF_UPDATE_HEART_RATE);
 }
 
 /**
@@ -45,6 +52,7 @@ void AED::setPadPlacement(ConnectionStatus connection) {
  */
 void AED::turnOnHandler() {
     if(battery <= 0) return;
+    aedWorker->abort = false;
     status = AED_ON;
     connection = NONE;
     emit update(status);
@@ -92,6 +100,7 @@ void AED::checkBatteryHandler() {
  */
 void AED::turnOffHandler() {
     status = AED_OFF;
+    aedWorker->abort = true;
     connection = NONE;
     shocks = 0;
     emit update(status);
@@ -138,21 +147,25 @@ void AED::attachPadsHandler() {
  *
  */
 void AED::checkConnectionHandler() {
-    if(status != ATTACH_PADS) return;
-    if (connection == GOOD) {
-        addLoadOnBattery(1);
-        update(status);
-        emit updateDisplay(patient->getAge() < 8 ? "CHILD PADZ" : "ADULT PADZ");
-        emit wait(WF_BEFORE_DONT_TOUCH_PATIENT);
-    } else if(connection == BAD) {
-        update(status);
-        emit updateDisplay("CHECK CONNECTION");
-        emit wait(WF_CHECK_CONNECTION);
-    } else {
-        emit wait(WF_CHECK_CONNECTION);
+    if(status < ATTACH_PADS) return;
+    if(status == ATTACH_PADS) {
+        if (connection == GOOD) {
+            addLoadOnBattery(1);
+            status = DONT_TOUCH_PATIENT;
+            update(status);
+            emit updateDisplay(patient->getAge() < 8 ? "CHILD PADZ" : "ADULT PADZ");
+            emit wait(WF_BEFORE_DONT_TOUCH_PATIENT);
+        } else if(connection == BAD) {
+            update(status);
+            emit updateDisplay("CHECK CONNECTION");
+        }
+    } else if(status > ATTACH_PADS && connection == NONE) {
+        // if we lost the connection after attaching the pads
+        status = ATTACH_PADS;
+        emit update(status);
     }
+    emit wait(WF_CHECK_CONNECTION);
 }
-
 /**
  * @brief Checks the connection of the pads onto the patient
  *

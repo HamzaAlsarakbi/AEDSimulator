@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include "model/aed/AED.h"
-#include "ui/EcgWidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -27,6 +26,7 @@ public slots:
     void turnOnHandler();
     void padsCorrectHandler();
     void padsIncorrectHandler();
+    void disconnectPadsHandler();
     void administerShockHandler();
     void cprHandler();
     void failTestHandler();
@@ -38,7 +38,6 @@ signals:
    void drawEcg(std::vector<Pulse> pulses);
 
 private:
-    EcgWidget* ecgWidget;
     Ui::MainWindow *ui;
     AED* aedDevice;
     void connectUI();

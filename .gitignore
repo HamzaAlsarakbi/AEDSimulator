@@ -1,9 +1,12 @@
 **/.idea
 **/.vscode
 **/cmake-build-*
-build-aed-Desktop-Debug/
+**/build-aed-*/
 
 .DS_Store
 
 ~$*
 *.bkp
+*.blend1
+
+**/aed.pro.user*
